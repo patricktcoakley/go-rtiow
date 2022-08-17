@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/patricktcoakley/go-rtiow/color"
+	"github.com/patricktcoakley/go-rtiow/vec3"
 )
 
 var errShutdown = errors.New("Shutdown")
@@ -29,12 +29,12 @@ func (g *Game) Update() error {
 	return nil
 }
 
-func (g *Game) WritePixel(x, y int, color *color.Color) {
+func (g *Game) WritePixel(x, y int, color vec3.Color) {
 	y = g.height - y - 1
 	offset := 4 * (y*g.width + x)
-	g.buffer[offset] = color.R
-	g.buffer[offset+1] = color.G
-	g.buffer[offset+2] = color.B
+	g.buffer[offset] = color[0]
+	g.buffer[offset+1] = color[1]
+	g.buffer[offset+2] = color[2]
 	g.buffer[offset+3] = 255
 }
 

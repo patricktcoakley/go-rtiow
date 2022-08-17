@@ -1,24 +1,33 @@
 package main
 
 import (
-	"github.com/patricktcoakley/go-rtiow/color"
 	"github.com/patricktcoakley/go-rtiow/game"
-)
-
-const (
-	Width  = 256
-	Height = 256
+	"github.com/patricktcoakley/go-rtiow/ray"
+	"github.com/patricktcoakley/go-rtiow/vec3"
 )
 
 func main() {
-	game := game.New(Width, Height, "go-rtiow")
-	for y := 0; y < Height; y++ {
-		for x := 0; x < Width; x++ {
-			r := uint8(float64(x) / (Width - 1) * 255.99)
-			g := uint8(float64(y) / (Height - 1) * 255.99)
-			b := uint8(64)
-			rgb := color.New(r, g, b)
-			game.WritePixel(x, y, rgb)
+	aspectRatio := 16.0 / 9.0
+	imageWidth := 400
+	imageHeight := int(float64(imageWidth) / aspectRatio)
+
+	viewportHeight := 2.0
+	viewportWidth := aspectRatio * viewportHeight
+	focalLength := 1.0
+
+	origin := vec3.Vec3{}
+	horizontal := vec3.Vec3{viewportWidth}
+	vertical := vec3.Vec3{0, viewportHeight, 0}
+	lowerLeftCorner := origin.Sub(horizontal.DivScalar(2)).Sub(vertical.DivScalar(2)).Sub(vec3.Vec3{0, 0, focalLength})
+
+	game := game.New(imageWidth, imageHeight, "go-rtiow")
+	for y := 0; y < imageHeight; y++ {
+		for x := 0; x < imageWidth; x++ {
+			u := float64(x) / float64(imageWidth-1)
+			v := float64(y) / float64(imageHeight-1)
+			r := ray.Ray{Origin: origin, Direction: lowerLeftCorner.Add(horizontal.MulScalar(u)).Add(vertical.MulScalar(v)).Sub(origin)}
+
+			game.WritePixel(x, y, r.Color())
 		}
 	}
 	game.Run()
