@@ -6,6 +6,7 @@ import (
 	"github.com/patricktcoakley/go-rtiow/vec3"
 )
 
+
 func main() {
 	aspectRatio := 16.0 / 9.0
 	imageWidth := 400
