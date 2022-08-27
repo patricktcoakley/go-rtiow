@@ -6,7 +6,6 @@ import (
 	"github.com/patricktcoakley/go-rtiow/vec3"
 )
 
-
 func main() {
 	aspectRatio := 16.0 / 9.0
 	imageWidth := 400
@@ -16,7 +15,7 @@ func main() {
 	viewportWidth := aspectRatio * viewportHeight
 	focalLength := 1.0
 
-	origin := vec3.Vec3{}
+	var origin vec3.Vec3
 	horizontal := vec3.Vec3{viewportWidth}
 	vertical := vec3.Vec3{0, viewportHeight, 0}
 	lowerLeftCorner := origin.Sub(horizontal.DivScalar(2)).Sub(vertical.DivScalar(2)).Sub(vec3.Vec3{0, 0, focalLength})

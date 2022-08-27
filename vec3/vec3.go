@@ -13,6 +13,10 @@ func (v Vec3) Length() float64 {
 	return math.Sqrt(Dot(v, v))
 }
 
+func (v Vec3) LengthSquared() float64 {
+	return v.Length() * v.Length()
+}
+
 func (v Vec3) ToUnit() Vec3 {
 	return DivScalar(v, v.Length())
 }

@@ -29,12 +29,12 @@ func (r Ray) Color() vec3.Color {
 
 func hitSphere(center vec3.Vec3, radius float64, r Ray) float64 {
 	originCenter := r.Origin.Sub(center)
-	a := vec3.Dot(r.Direction, r.Direction)
-	b := 2.0 * vec3.Dot(originCenter, r.Direction)
-	c := vec3.Dot(originCenter, originCenter) - (radius * radius)
-	discriminant := b*b - (4 * a * c)
+	a := r.Direction.LengthSquared()
+	half_b := vec3.Dot(r.Direction, originCenter)
+	c := originCenter.LengthSquared() - radius*radius
+	discriminant := half_b*half_b - a*c
 	if discriminant < 0 {
 		return -1.0
 	}
-	return (-b - math.Sqrt(discriminant)) / (2.0 * a)
+	return (-half_b - math.Sqrt(discriminant)) / a
 }
