@@ -3,23 +3,24 @@ package hittable
 import (
 	"math"
 
-	"github.com/patricktcoakley/go-rtiow/geom"
+	"github.com/patricktcoakley/go-rtiow/internal/ray"
+	"github.com/patricktcoakley/go-rtiow/internal/vec3"
 )
 
 type Sphere struct {
-	Center geom.Vec3
+	Center vec3.Vec3
 	Radius float64
 }
 
 func NewSphere(centerX, centerY, centerZ, radius float64) Sphere {
-	v := geom.Vec3{centerX, centerY, centerZ}
+	v := vec3.Vec3{centerX, centerY, centerZ}
 	return Sphere{v, radius}
 }
 
-func (s Sphere) Hit(r geom.Ray, tMin, tMax float64, hr *HitRecord) bool {
+func (s Sphere) Hit(r ray.Ray, tMin, tMax float64, hr *HitRecord) bool {
 	originCenter := r.Origin.Sub(s.Center)
 	a := r.Direction.LengthSquared()
-	half_b := geom.Dot(r.Direction, originCenter)
+	half_b := vec3.Dot(r.Direction, originCenter)
 	c := originCenter.LengthSquared() - s.Radius*s.Radius
 	discriminant := half_b*half_b - a*c
 	if discriminant < 0 {

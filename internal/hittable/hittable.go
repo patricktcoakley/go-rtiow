@@ -1,24 +1,25 @@
 package hittable
 
 import (
-	"github.com/patricktcoakley/go-rtiow/geom"
+	"github.com/patricktcoakley/go-rtiow/internal/ray"
+	"github.com/patricktcoakley/go-rtiow/internal/vec3"
 )
 
 type Hittable interface {
-	Hit(r geom.Ray, tMin, tMax float64, hr *HitRecord) bool
+	Hit(r ray.Ray, tMin, tMax float64, hr *HitRecord) bool
 }
 
 type HitRecord struct {
-	Point     geom.Vec3
-	Normal    geom.Vec3
+	Point     vec3.Vec3
+	Normal    vec3.Vec3
 	T         float64
 	FrontFace bool
 }
 
 type HittableList []Hittable
 
-func (hr *HitRecord) SetFaceNormal(r geom.Ray, outwardNormal geom.Vec3) {
-	hr.FrontFace = geom.Dot(r.Direction, outwardNormal) < 0
+func (hr *HitRecord) SetFaceNormal(r ray.Ray, outwardNormal vec3.Vec3) {
+	hr.FrontFace = vec3.Dot(r.Direction, outwardNormal) < 0
 	if hr.FrontFace {
 		hr.Normal = outwardNormal
 	} else {
@@ -26,7 +27,7 @@ func (hr *HitRecord) SetFaceNormal(r geom.Ray, outwardNormal geom.Vec3) {
 	}
 }
 
-func (hl HittableList) Hit(r geom.Ray, tMin, tMax float64, hr *HitRecord) bool {
+func (hl HittableList) Hit(r ray.Ray, tMin, tMax float64, hr *HitRecord) bool {
 	var tempHr HitRecord
 	hitAnything := false
 	closestSoFar := tMax

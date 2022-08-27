@@ -1,9 +1,9 @@
-package geom
+package vec3
 
 import "math"
 
+
 type Vec3 [3]float64
-type Color [3]uint8
 
 func (v Vec3) Neg() Vec3 {
 	return Vec3{-v[0], -v[1], -v[2]}
@@ -19,14 +19,6 @@ func (v Vec3) LengthSquared() float64 {
 
 func (v Vec3) ToUnit() Vec3 {
 	return DivScalar(v, v.Length())
-}
-
-func (v Vec3) ToRGB() Color {
-	return Color{
-		uint8(clamp(v[0]) * 256),
-		uint8(clamp(v[1]) * 256),
-		uint8(clamp(v[2]) * 256),
-	}
 }
 
 func Add(lhs, rhs Vec3) Vec3 {
@@ -96,15 +88,4 @@ func Cross(lhs, rhs Vec3) Vec3 {
 
 func (v Vec3) Cross(rhs Vec3) Vec3 {
 	return Cross(v, rhs)
-}
-
-func clamp(x float64) float64 {
-	if x < 0.0 {
-		return 0.0
-	}
-	if x > 0.999 {
-		return 0.999
-	}
-
-	return x
 }
