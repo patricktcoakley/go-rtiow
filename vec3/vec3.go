@@ -23,9 +23,9 @@ func (v Vec3) ToUnit() Vec3 {
 
 func (v Vec3) ToRGB() Color {
 	return Color{
-		uint8(v[0] * 255.99),
-		uint8(v[1] * 255.99),
-		uint8(v[2] * 255.99),
+		uint8(clamp(v[0]) * 256),
+		uint8(clamp(v[1]) * 256),
+		uint8(clamp(v[2]) * 256),
 	}
 }
 
@@ -96,4 +96,15 @@ func Cross(lhs, rhs Vec3) Vec3 {
 
 func (v Vec3) Cross(rhs Vec3) Vec3 {
 	return Cross(v, rhs)
+}
+
+func clamp(x float64) float64 {
+	if x < 0.0 {
+		return 0.0
+	}
+	if x > 0.999 {
+		return 0.999
+	}
+
+	return x
 }
