@@ -37,11 +37,14 @@ func main() {
 
 	for y := 0; y < imageHeight; y++ {
 		for x := 0; x < imageWidth; x++ {
-			u := (float64(x) + rand.Float64()) / float64(imageWidth-1)
-			v := (float64(y) + rand.Float64()) / float64(imageHeight-1)
-			r := camera.GetRay(u, v)
-			color := rayColor(r, world)
-			viewer.WritePixel(x, y, color)
+			var pixelColor vec3.Vec3
+			for s := 0; s < 10; s++ {
+				u := (float64(x) + rand.Float64()) / float64(imageWidth-1)
+				v := (float64(y) + rand.Float64()) / float64(imageHeight-1)
+				r := camera.GetRay(u, v)
+				pixelColor = vec3.Add(pixelColor, rayColor(r, world))
+			}
+			viewer.WritePixel(x, y, pixelColor, 10)
 		}
 	}
 	viewer.Run()
