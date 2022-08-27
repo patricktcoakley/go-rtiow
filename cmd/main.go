@@ -34,17 +34,17 @@ func main() {
 	world := hittable.HittableList{hittable.NewSphere(0, 0, -1, 0.5), hittable.NewSphere(0, -100.5, -1, 100)}
 	camera := camera.NewCamera()
 	viewer := canvas.NewCanvas(imageWidth, imageHeight, "go-rtiow")
-
+	samplesPerPixel := 100
 	for y := 0; y < imageHeight; y++ {
 		for x := 0; x < imageWidth; x++ {
 			var pixelColor vec3.Vec3
-			for s := 0; s < 10; s++ {
+			for s := 0; s < samplesPerPixel; s++ {
 				u := (float64(x) + rand.Float64()) / float64(imageWidth-1)
 				v := (float64(y) + rand.Float64()) / float64(imageHeight-1)
 				r := camera.GetRay(u, v)
 				pixelColor = vec3.Add(pixelColor, rayColor(r, world))
 			}
-			viewer.WritePixel(x, y, pixelColor, 10)
+			viewer.WritePixel(x, y, pixelColor, float64(samplesPerPixel))
 		}
 	}
 	viewer.Run()
