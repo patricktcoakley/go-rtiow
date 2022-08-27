@@ -1,15 +1,14 @@
 package camera
 
 import (
-	"github.com/patricktcoakley/go-rtiow/ray"
-	"github.com/patricktcoakley/go-rtiow/vec3"
+	"github.com/patricktcoakley/go-rtiow/geom"
 )
 
 type Camera struct {
-	origin          vec3.Vec3
-	lowerLeftCorner vec3.Vec3
-	horizontal      vec3.Vec3
-	vertical        vec3.Vec3
+	origin          geom.Vec3
+	lowerLeftCorner geom.Vec3
+	horizontal      geom.Vec3
+	vertical        geom.Vec3
 }
 
 func NewCamera() Camera {
@@ -18,14 +17,14 @@ func NewCamera() Camera {
 	viewportWidth := aspectRatio * viewportHeight
 	focalLength := 1.0
 
-	var origin vec3.Vec3
-	horizontal := vec3.Vec3{viewportWidth, 0, 0}
-	vertical := vec3.Vec3{0, viewportHeight, 0}
-	lowerLeftCorner := origin.Sub(horizontal.DivScalar(2)).Sub(vertical.DivScalar(2)).Sub(vec3.Vec3{0, 0, focalLength})
+	var origin geom.Vec3
+	horizontal := geom.Vec3{viewportWidth, 0, 0}
+	vertical := geom.Vec3{0, viewportHeight, 0}
+	lowerLeftCorner := origin.Sub(horizontal.DivScalar(2)).Sub(vertical.DivScalar(2)).Sub(geom.Vec3{0, 0, focalLength})
 
 	return Camera{origin, lowerLeftCorner, horizontal, vertical}
 }
 
-func (c Camera) GetRay(u, v float64) ray.Ray {
-	return ray.Ray{Origin: c.origin, Direction: c.lowerLeftCorner.Add(c.horizontal.MulScalar(u)).Add(c.vertical.MulScalar(v)).Sub(c.origin)}
+func (c Camera) GetRay(u, v float64) geom.Ray {
+	return geom.Ray{Origin: c.origin, Direction: c.lowerLeftCorner.Add(c.horizontal.MulScalar(u)).Add(c.vertical.MulScalar(v)).Sub(c.origin)}
 }
