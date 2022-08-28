@@ -12,8 +12,7 @@ type Camera struct {
 	vertical        vec3.Vec3
 }
 
-func NewCamera() Camera {
-	aspectRatio := 16.0 / 9.0
+func NewCamera(aspectRatio float64) Camera {
 	viewportHeight := 2.0
 	viewportWidth := aspectRatio * viewportHeight
 	focalLength := 1.0
