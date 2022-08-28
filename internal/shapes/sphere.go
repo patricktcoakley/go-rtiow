@@ -1,8 +1,9 @@
-package hittable
+package shapes
 
 import (
 	"math"
 
+	"github.com/patricktcoakley/go-rtiow/internal/hittable"
 	"github.com/patricktcoakley/go-rtiow/internal/ray"
 	"github.com/patricktcoakley/go-rtiow/internal/vec3"
 )
@@ -17,7 +18,7 @@ func NewSphere(centerX, centerY, centerZ, radius float64) Sphere {
 	return Sphere{v, radius}
 }
 
-func (s Sphere) Hit(r ray.Ray, tMin, tMax float64, hr *HitRecord) bool {
+func (s Sphere) Hit(r ray.Ray, tMin, tMax float64, hr *hittable.HitRecord) bool {
 	originCenter := r.Origin.Sub(s.Center)
 	a := r.Direction.LengthSquared()
 	half_b := vec3.Dot(r.Direction, originCenter)

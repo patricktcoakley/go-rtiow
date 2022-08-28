@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"math"
 	"math/rand"
 
@@ -8,8 +9,17 @@ import (
 	"github.com/patricktcoakley/go-rtiow/internal/canvas"
 	"github.com/patricktcoakley/go-rtiow/internal/hittable"
 	"github.com/patricktcoakley/go-rtiow/internal/ray"
+	"github.com/patricktcoakley/go-rtiow/internal/shapes"
 	"github.com/patricktcoakley/go-rtiow/internal/vec3"
 )
+
+var samplesPerPixel int
+var imageWidth int
+
+func init() {
+	flag.IntVar(&samplesPerPixel, "samples", 100, "Number of samples per pixel")
+	flag.IntVar(&imageWidth, "width", 400, "Width of render")
+}
 
 func rayColor(r ray.Ray, world hittable.Hittable) vec3.Vec3 {
 	var hr hittable.HitRecord
@@ -28,13 +38,15 @@ func rayColor(r ray.Ray, world hittable.Hittable) vec3.Vec3 {
 }
 
 func main() {
+	flag.Parse()
 	aspectRatio := 16.0 / 9.0
-	imageWidth := 400
 	imageHeight := int(float64(imageWidth) / aspectRatio)
-	world := hittable.HittableList{hittable.NewSphere(0, 0, -1, 0.5), hittable.NewSphere(0, -100.5, -1, 100)}
+	world := hittable.HittableList{
+		shapes.NewSphere(0, 0, -1, 0.5),
+		shapes.NewSphere(0, -100.5, -1, 100),
+	}
 	camera := camera.NewCamera()
 	viewer := canvas.NewCanvas(imageWidth, imageHeight, "go-rtiow")
-	samplesPerPixel := 100
 	for y := 0; y < imageHeight; y++ {
 		for x := 0; x < imageWidth; x++ {
 			var pixelColor vec3.Vec3
@@ -44,7 +56,7 @@ func main() {
 				r := camera.GetRay(u, v)
 				pixelColor = vec3.Add(pixelColor, rayColor(r, world))
 			}
-			viewer.WritePixel(x, y, pixelColor, float64(samplesPerPixel))
+			viewer.WritePixel(x, y, pixelColor, samplesPerPixel)
 		}
 	}
 	viewer.Run()

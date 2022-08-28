@@ -32,8 +32,8 @@ func (c *Canvas) Update() error {
 	return nil
 }
 
-func (c *Canvas) WritePixel(x, y int, color vec3.Vec3, samplesPerPixel float64) {
-	scale := 1 / samplesPerPixel
+func (c *Canvas) WritePixel(x, y int, color vec3.Vec3, samplesPerPixel int) {
+	scale := 1 / float64(samplesPerPixel)
 	pixelColor := newColorFromVec3(color, scale)
 	y = c.height - y - 1
 	offset := 4 * (y*c.width + x)
