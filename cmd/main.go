@@ -25,9 +25,13 @@ func init() {
 func main() {
 	flag.Parse()
 	imageHeight := int(float64(imageWidth) / aspectRatio)
-	world := hittable.HittableList{shapes.NewSphere(0, 0, -1, 0.5), shapes.NewSphere(0, -100.5, -1, 100)}
+	world := hittable.HittableList{
+		shapes.NewSphere(0, 0, -1, 0.5),
+		shapes.NewSphere(0, -100.5, -1, 100),
+	}
 	camera := camera.NewCamera(aspectRatio)
-	viewer := canvas.NewCanvas(imageWidth, imageHeight, "go-rtiow")
+	viewer := canvas.NewCanvas(imageWidth, imageHeight, samplesPerPixel, "go-rtiow")
+
 	for y := 0; y < imageHeight; y++ {
 		for x := 0; x < imageWidth; x++ {
 			var pixelColor vec3.Vec3
@@ -37,7 +41,7 @@ func main() {
 				r := camera.GetRay(u, v)
 				pixelColor = vec3.Add(pixelColor, tracer.RayColor(r, world))
 			}
-			viewer.WritePixel(x, y, pixelColor, samplesPerPixel)
+			viewer.WritePixel(x, y, pixelColor)
 		}
 	}
 	viewer.Run()

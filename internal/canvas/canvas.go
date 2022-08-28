@@ -14,14 +14,19 @@ import (
 var errShutdown = errors.New("Shutdown")
 
 type Canvas struct {
-	width, height int
-	buffer        []byte
+	width, height   int
+	samplesPerPixel float64
+	buffer          []byte
 }
 
-func NewCanvas(width, height int, title string) *Canvas {
+func NewCanvas(width, height, samplesPerPixel int, title string) *Canvas {
 	ebiten.SetWindowSize(width, height)
 	ebiten.SetWindowTitle(title)
-	return &Canvas{width, height, make([]byte, width*height*4)}
+	return &Canvas{
+		width,
+		height,
+		float64(samplesPerPixel),
+		make([]byte, width*height*4)}
 }
 
 func (c *Canvas) Update() error {
@@ -31,11 +36,15 @@ func (c *Canvas) Update() error {
 	return nil
 }
 
-func (c *Canvas) WritePixel(x, y int, color vec3.Vec3, samplesPerPixel int) {
-	scale := 1 / float64(samplesPerPixel)
-	pixelColor := newColorFromVec3(color, scale)
+func (c *Canvas) pixelOffset(x, y int) int {
 	y = c.height - y - 1
-	offset := 4 * (y*c.width + x)
+	return 4 * (y*c.width + x)
+}
+
+func (c *Canvas) WritePixel(x, y int, color vec3.Vec3) {
+	scale := 1 / c.samplesPerPixel
+	pixelColor := newColorFromVec3(color, scale)
+	offset := c.pixelOffset(x, y)
 	c.buffer[offset] = pixelColor.R
 	c.buffer[offset+1] = pixelColor.G
 	c.buffer[offset+2] = pixelColor.B
