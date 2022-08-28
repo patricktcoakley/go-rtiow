@@ -2,6 +2,7 @@ package canvas
 
 import (
 	"errors"
+	"image/color"
 	"log"
 	"os"
 
@@ -11,8 +12,6 @@ import (
 )
 
 var errShutdown = errors.New("Shutdown")
-
-type RGB [3]uint8
 
 type Canvas struct {
 	width, height int
@@ -37,10 +36,10 @@ func (c *Canvas) WritePixel(x, y int, color vec3.Vec3, samplesPerPixel int) {
 	pixelColor := newColorFromVec3(color, scale)
 	y = c.height - y - 1
 	offset := 4 * (y*c.width + x)
-	c.buffer[offset] = pixelColor[0]
-	c.buffer[offset+1] = pixelColor[1]
-	c.buffer[offset+2] = pixelColor[2]
-	c.buffer[offset+3] = 255
+	c.buffer[offset] = pixelColor.R
+	c.buffer[offset+1] = pixelColor.G
+	c.buffer[offset+2] = pixelColor.B
+	c.buffer[offset+3] = pixelColor.A
 }
 
 func (c *Canvas) Draw(screen *ebiten.Image) {
@@ -60,11 +59,12 @@ func (c *Canvas) Run() {
 	}
 }
 
-func newColorFromVec3(v vec3.Vec3, scale float64) RGB {
-	return RGB{
+func newColorFromVec3(v vec3.Vec3, scale float64) color.RGBA {
+	return color.RGBA{
 		uint8(clamp(v[0]*scale) * 256),
 		uint8(clamp(v[1]*scale) * 256),
 		uint8(clamp(v[2]*scale) * 256),
+		255,
 	}
 }
 
