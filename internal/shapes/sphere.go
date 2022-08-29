@@ -29,9 +29,9 @@ func (s Sphere) Hit(r ray.Ray, tMin, tMax float64, hr *hittable.HitRecord) bool 
 	}
 	sqrtd := math.Sqrt(discriminant)
 	root := (-half_b - sqrtd) / a
-	if root < tMin || tMax < root {
+	if root < tMin || root > tMax {
 		root = (-half_b - sqrtd) / a
-		if root < tMin || tMax < root {
+		if root < tMin || root > tMax {
 			return false
 		}
 	}
