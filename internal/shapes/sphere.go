@@ -28,7 +28,7 @@ func (s Sphere) Hit(r ray.Ray, tMin, tMax float64, hr *hittable.HitRecord) bool 
 		return false
 	}
 	sqrtd := math.Sqrt(discriminant)
-	root := (-half_b - math.Sqrt(discriminant)) / a
+	root := (-half_b - sqrtd) / a
 	if root < tMin || tMax < root {
 		root = (-half_b - sqrtd) / a
 		if root < tMin || tMax < root {
@@ -37,7 +37,6 @@ func (s Sphere) Hit(r ray.Ray, tMin, tMax float64, hr *hittable.HitRecord) bool 
 	}
 	hr.T = root
 	hr.Point = r.At(hr.T)
-	hr.Normal = (hr.Point.Sub(s.Center)).DivScalar(s.Radius)
 	outwardNormal := (hr.Point.Sub(s.Center)).DivScalar(s.Radius)
 	hr.SetFaceNormal(r, outwardNormal)
 	return true
