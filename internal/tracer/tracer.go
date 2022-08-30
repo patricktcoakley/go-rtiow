@@ -8,13 +8,16 @@ import (
 	"github.com/patricktcoakley/go-rtiow/internal/vec3"
 )
 
-func RayColor(r ray.Ray, world hittable.Hittable) vec3.Vec3 {
+func RayColor(r ray.Ray, world hittable.Hittable, depth int) vec3.Vec3 {
 	var hr hittable.HitRecord
-	if world.Hit(r, 0, math.MaxFloat64, &hr) {
-		return vec3.MulScalar(
-			vec3.Add(hr.Normal, vec3.Vec3{1, 1, 1}),
-			0.5,
-		)
+	if world.Hit(r, math.SmallestNonzeroFloat64, math.MaxFloat64, &hr) {
+		scattered := ray.Ray{}
+		attenuation := vec3.Vec3{}
+		if hr.Material.Scatter(r, hr, &attenuation, &scattered) {
+			return attenuation.Mul(RayColor(scattered, world, depth-1))
+		}
+
+		return vec3.Vec3{}
 	}
 
 	t := (r.Direction.ToUnit()[1] + 1.0) * 0.5

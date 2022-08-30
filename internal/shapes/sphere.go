@@ -9,13 +9,14 @@ import (
 )
 
 type Sphere struct {
-	Center vec3.Vec3
-	Radius float64
+	Center   vec3.Vec3
+	Radius   float64
+	Material hittable.Material
 }
 
-func NewSphere(centerX, centerY, centerZ, radius float64) Sphere {
+func NewSphere(centerX, centerY, centerZ, radius float64, material hittable.Material) Sphere {
 	v := vec3.Vec3{centerX, centerY, centerZ}
-	return Sphere{v, radius}
+	return Sphere{v, radius, material}
 }
 
 func (s Sphere) Hit(r ray.Ray, tMin, tMax float64, hr *hittable.HitRecord) bool {
@@ -39,5 +40,6 @@ func (s Sphere) Hit(r ray.Ray, tMin, tMax float64, hr *hittable.HitRecord) bool 
 	hr.Point = r.At(hr.T)
 	outwardNormal := (hr.Point.Sub(s.Center)).DivScalar(s.Radius)
 	hr.SetFaceNormal(r, outwardNormal)
+	hr.Material = s.Material
 	return true
 }

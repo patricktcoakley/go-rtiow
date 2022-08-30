@@ -12,11 +12,12 @@ type Hittable interface {
 type HitRecord struct {
 	Point     vec3.Vec3
 	Normal    vec3.Vec3
+	Material  Material
 	T         float64
 	FrontFace bool
 }
 
-type HittableList []Hittable
+type HitList []Hittable
 
 func (hr *HitRecord) SetFaceNormal(r ray.Ray, outwardNormal vec3.Vec3) {
 	hr.FrontFace = vec3.Dot(r.Direction, outwardNormal) < 0
@@ -27,7 +28,7 @@ func (hr *HitRecord) SetFaceNormal(r ray.Ray, outwardNormal vec3.Vec3) {
 	}
 }
 
-func (hl HittableList) Hit(r ray.Ray, tMin, tMax float64, hr *HitRecord) bool {
+func (hl HitList) Hit(r ray.Ray, tMin, tMax float64, hr *HitRecord) bool {
 	var tempHr HitRecord
 	hitAnything := false
 	closestSoFar := tMax

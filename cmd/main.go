@@ -12,6 +12,8 @@ import (
 	"github.com/patricktcoakley/go-rtiow/internal/vec3"
 )
 
+const maxDepth = 50
+
 var samplesPerPixel int
 var imageWidth int
 var aspectRatio float64
@@ -25,9 +27,16 @@ func init() {
 func main() {
 	flag.Parse()
 	imageHeight := int(float64(imageWidth) / aspectRatio)
-	world := hittable.HittableList{
-		shapes.NewSphere(0, 0, -1, 0.5),
-		shapes.NewSphere(0, -100.5, -1, 100),
+	ground := hittable.NewLambertian(0.8, 0.8, 0.0)
+	center := hittable.NewLambertian(0.7, 0.3, 0.3)
+	left := hittable.NewMetal(0.8, 0.8, 0.8, 0.3)
+	right := hittable.NewMetal(0.8, 0.6, 0.2, 1.0)
+
+	world := hittable.HitList{
+		shapes.NewSphere(0, -100.5, -1, 100, ground),
+		shapes.NewSphere(0, 0, -1, 0.5, center),
+		shapes.NewSphere(-1., 0, -1, 0.5, left),
+		shapes.NewSphere(1., 0, -1, 0.5, right),
 	}
 	camera := camera.NewCamera(aspectRatio)
 	viewer := canvas.NewCanvas(imageWidth, imageHeight, samplesPerPixel, "go-rtiow")
@@ -39,7 +48,7 @@ func main() {
 				u := (float64(x) + rand.Float64()) / float64(imageWidth-1)
 				v := (float64(y) + rand.Float64()) / float64(imageHeight-1)
 				r := camera.GetRay(u, v)
-				pixelColor = vec3.Add(pixelColor, tracer.RayColor(r, world))
+				pixelColor = vec3.Add(pixelColor, tracer.RayColor(r, world, maxDepth))
 			}
 			viewer.WritePixel(x, y, pixelColor)
 		}

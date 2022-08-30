@@ -1,7 +1,9 @@
 package vec3
 
-import "math"
-
+import (
+	"math"
+	"math/rand"
+)
 
 type Vec3 [3]float64
 
@@ -88,4 +90,55 @@ func Cross(lhs, rhs Vec3) Vec3 {
 
 func (v Vec3) Cross(rhs Vec3) Vec3 {
 	return Cross(v, rhs)
+}
+
+func (v Vec3) NearZero() bool {
+	s := 1e-8
+	return math.Abs(v[0]) < s && math.Abs(v[1]) < s && math.Abs(v[2]) < s
+}
+
+func Reflect(lhs, rhs Vec3) Vec3 {
+	return lhs.Sub(
+		MulScalar(
+			MulScalar(
+				rhs,
+				Dot(lhs, rhs),
+			),
+			2.,
+		),
+	)
+}
+
+func NewRandomVec3() Vec3 {
+	return Vec3{rand.Float64(), rand.Float64(), rand.Float64()}
+}
+
+func NewRandomRangeVec3(min, max float64) Vec3 {
+	x := (min) + (max-min)*rand.Float64()
+	y := (min) + (max-min)*rand.Float64()
+	z := (min) + (max-min)*rand.Float64()
+
+	return Vec3{x, y, z}
+}
+
+func RandomInUnitSphere() Vec3 {
+	p := NewRandomRangeVec3(-1, 1)
+	for p.LengthSquared() >= 1 {
+		p = NewRandomRangeVec3(-1, 1)
+	}
+
+	return p
+}
+
+func NewRandomUnitVector() Vec3 {
+	return RandomInUnitSphere().ToUnit()
+}
+
+func RandomInHempishphere(normal Vec3) Vec3 {
+	inUnitSphere := RandomInUnitSphere()
+	if Dot(inUnitSphere, normal) > 0. {
+		return inUnitSphere
+	}
+
+	return inUnitSphere.Neg()
 }

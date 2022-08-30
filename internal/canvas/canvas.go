@@ -4,6 +4,7 @@ import (
 	"errors"
 	"image/color"
 	"log"
+	"math"
 	"os"
 
 	"github.com/patricktcoakley/go-rtiow/internal/vec3"
@@ -70,9 +71,9 @@ func (c *Canvas) Run() {
 
 func newColorFromVec3(v vec3.Vec3, scale float64) color.RGBA {
 	return color.RGBA{
-		uint8(clamp(v[0]*scale) * 256),
-		uint8(clamp(v[1]*scale) * 256),
-		uint8(clamp(v[2]*scale) * 256),
+		uint8(clamp(math.Sqrt(v[0]*scale)) * 256),
+		uint8(clamp(math.Sqrt(v[1]*scale)) * 256),
+		uint8(clamp(math.Sqrt(v[2]*scale)) * 256),
 		255,
 	}
 }
