@@ -12,7 +12,7 @@ type Camera struct {
 	vertical        vec3.Vec3
 }
 
-func NewCamera(aspectRatio float64) Camera {
+func NewCamera(aspectRatio float64) *Camera {
 	viewportHeight := 2.0
 	viewportWidth := aspectRatio * viewportHeight
 	focalLength := 1.0
@@ -22,9 +22,9 @@ func NewCamera(aspectRatio float64) Camera {
 	vertical := vec3.Vec3{0, viewportHeight, 0}
 	lowerLeftCorner := origin.Sub(horizontal.DivScalar(2)).Sub(vertical.DivScalar(2)).Sub(vec3.Vec3{0, 0, focalLength})
 
-	return Camera{origin, lowerLeftCorner, horizontal, vertical}
+	return &Camera{origin, lowerLeftCorner, horizontal, vertical}
 }
 
-func (c Camera) GetRay(u, v float64) ray.Ray {
+func (c *Camera) GetRay(u, v float64) ray.Ray {
 	return ray.Ray{Origin: c.origin, Direction: c.lowerLeftCorner.Add(c.horizontal.MulScalar(u)).Add(c.vertical.MulScalar(v)).Sub(c.origin)}
 }

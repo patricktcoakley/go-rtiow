@@ -14,12 +14,12 @@ type Sphere struct {
 	Material hittable.Material
 }
 
-func NewSphere(centerX, centerY, centerZ, radius float64, material hittable.Material) Sphere {
+func NewSphere(centerX, centerY, centerZ, radius float64, material hittable.Material) *Sphere {
 	v := vec3.Vec3{centerX, centerY, centerZ}
-	return Sphere{v, radius, material}
+	return &Sphere{v, radius, material}
 }
 
-func (s Sphere) Hit(r ray.Ray, tMin, tMax float64, hr *hittable.HitRecord) bool {
+func (s *Sphere) Hit(r ray.Ray, tMin, tMax float64, hr *hittable.HitRecord) bool {
 	originCenter := r.Origin.Sub(s.Center)
 	a := r.Direction.LengthSquared()
 	half_b := vec3.Dot(r.Direction, originCenter)

@@ -17,7 +17,7 @@ func NewMetal(r, g, b, fuzziness float64) *Metal {
 	return &Metal{vec3.Vec3{r, g, b}, fuzziness}
 }
 
-func (m *Metal) Scatter(r ray.Ray, hr HitRecord, attenuation *vec3.Vec3, scattered *ray.Ray) bool {
+func (m *Metal) Scatter(r ray.Ray, hr *HitRecord, attenuation *vec3.Vec3, scattered *ray.Ray) bool {
 	reflected := vec3.Reflect(r.Direction.ToUnit(), hr.Normal)
 	*scattered = ray.Ray{Origin: hr.Point, Direction: reflected.Add(vec3.MulScalar(vec3.RandomInUnitSphere(), m.fuzziness))}
 	*attenuation = m.Albedo
