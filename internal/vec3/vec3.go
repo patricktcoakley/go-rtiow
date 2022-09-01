@@ -98,15 +98,24 @@ func (v Vec3) NearZero() bool {
 }
 
 func Reflect(lhs, rhs Vec3) Vec3 {
-	return lhs.Sub(
-		MulScalar(
-			MulScalar(
-				rhs,
-				Dot(lhs, rhs),
-			),
-			2.,
-		),
+	return Sub(
+		lhs,
+		MulScalar(MulScalar(rhs, Dot(lhs, rhs)), 2.),
 	)
+}
+
+func Refract(uv, n Vec3, etai_over_etat float64) Vec3 {
+	cosTheta := math.Min(Dot(uv.Neg(), n), 1.0)
+	rOutPerp := MulScalar(
+		Add(uv, MulScalar(n, cosTheta)),
+		etai_over_etat,
+	)
+
+	rOutParallel := MulScalar(
+		n,
+		-math.Sqrt(math.Abs(1.0-rOutPerp.LengthSquared())),
+	)
+	return Add(rOutPerp, rOutParallel)
 }
 
 func NewRandomVec3() Vec3 {

@@ -6,5 +6,5 @@ import (
 )
 
 type Material interface {
-	Scatter(r ray.Ray, hr *HitRecord, attenuation *vec3.Vec3, scattered *ray.Ray) bool
+	Scatter(rIn ray.Ray, hr HitRecord, attenuation *vec3.Vec3, scattered *ray.Ray) bool
 }

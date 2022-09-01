@@ -28,8 +28,8 @@ func main() {
 	flag.Parse()
 	imageHeight := int(float64(imageWidth) / aspectRatio)
 	ground := hittable.NewLambertian(0.8, 0.8, 0.0)
-	center := hittable.NewLambertian(0.7, 0.3, 0.3)
-	left := hittable.NewMetal(0.8, 0.8, 0.8, 0.3)
+	center := hittable.NewDieletric(1.5)
+	left := hittable.NewDieletric(1.5)
 	right := hittable.NewMetal(0.8, 0.6, 0.2, 1.0)
 
 	world := hittable.HitList{

@@ -10,11 +10,11 @@ import (
 
 func RayColor(r ray.Ray, world hittable.Hittable, depth int) vec3.Vec3 {
 	var hr hittable.HitRecord
-	if world.Hit(r, math.SmallestNonzeroFloat64, math.MaxFloat64, &hr) {
+	if world.Hit(r, 0.001, math.MaxFloat64, &hr) {
 		scattered := ray.Ray{}
 		attenuation := vec3.Vec3{}
-		if hr.Material.Scatter(r, &hr, &attenuation, &scattered) {
-			return attenuation.Mul(RayColor(scattered, world, depth-1))
+		if hr.Material.Scatter(r, hr, &attenuation, &scattered) {
+			return vec3.Mul(RayColor(scattered, world, depth-1), attenuation)
 		}
 
 		return vec3.Vec3{}
