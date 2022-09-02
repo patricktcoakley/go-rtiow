@@ -2,7 +2,9 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"math/rand"
+	"time"
 
 	"github.com/patricktcoakley/go-rtiow/internal/camera"
 	"github.com/patricktcoakley/go-rtiow/internal/canvas"
@@ -26,6 +28,7 @@ func init() {
 
 func main() {
 	flag.Parse()
+	start := time.Now()
 	imageHeight := int(float64(imageWidth) / aspectRatio)
 	ground := hittable.NewLambertian(0.8, 0.8, 0.0)
 	center := hittable.NewLambertian(0.1, 0.2, 0.5)
@@ -41,7 +44,6 @@ func main() {
 	}
 	camera := camera.NewCamera(aspectRatio)
 	viewer := canvas.NewCanvas(imageWidth, imageHeight, samplesPerPixel, "go-rtiow")
-
 	for y := 0; y < imageHeight; y++ {
 		for x := 0; x < imageWidth; x++ {
 			var pixelColor vec3.Vec3
@@ -49,10 +51,10 @@ func main() {
 				u := (float64(x) + rand.Float64()) / float64(imageWidth-1)
 				v := (float64(y) + rand.Float64()) / float64(imageHeight-1)
 				r := camera.GetRay(u, v)
-				pixelColor = vec3.Add(pixelColor, tracer.RayColor(r, world, maxDepth))
+				pixelColor = vec3.Add(pixelColor, tracer.RayColor(r, world))
 			}
 			viewer.WritePixel(x, y, pixelColor)
 		}
 	}
-	viewer.Run()
+	fmt.Print(time.Since(start))
 }
