@@ -23,7 +23,7 @@ func rayColor(r ray.Ray, world hittable.Hittable, depth int) vec3.Vec3 {
 	if world.Hit(r, 0.001, math.MaxFloat64, &hr) {
 		scattered := ray.Ray{}
 		attenuation := vec3.Vec3{}
-		for hr.Material.Scatter(r, &hr, &attenuation, &scattered) {
+		if hr.Material.Scatter(r, &hr, &attenuation, &scattered) {
 			return vec3.Mul(rayColor(scattered, world, depth-1), attenuation)
 		}
 		return vec3.Vec3{}
