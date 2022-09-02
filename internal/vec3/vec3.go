@@ -12,11 +12,11 @@ func (v Vec3) Neg() Vec3 {
 }
 
 func (v Vec3) Length() float64 {
-	return math.Sqrt(Dot(v, v))
+	return math.Sqrt(v.LengthSquared())
 }
 
 func (v Vec3) LengthSquared() float64 {
-	return v.Length() * v.Length()
+	return Dot(v, v)
 }
 
 func (v Vec3) ToUnit() Vec3 {
