@@ -2,9 +2,7 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"math/rand"
-	"time"
 
 	"github.com/patricktcoakley/go-rtiow/internal/camera"
 	"github.com/patricktcoakley/go-rtiow/internal/canvas"
@@ -28,7 +26,6 @@ func init() {
 
 func main() {
 	flag.Parse()
-	start := time.Now()
 	imageHeight := int(float64(imageWidth) / aspectRatio)
 	ground := hittable.NewLambertian(0.8, 0.8, 0.0)
 	center := hittable.NewLambertian(0.1, 0.2, 0.5)
@@ -56,5 +53,5 @@ func main() {
 			viewer.WritePixel(x, y, pixelColor)
 		}
 	}
-	fmt.Print(time.Since(start))
+	viewer.Run()
 }
