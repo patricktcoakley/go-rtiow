@@ -12,8 +12,6 @@ import (
 	"github.com/patricktcoakley/go-rtiow/internal/vec3"
 )
 
-const maxDepth = 50
-
 var samplesPerPixel int
 var imageWidth int
 var aspectRatio float64
@@ -40,7 +38,7 @@ func main() {
 		shapes.NewSphere(1., 0, -1, 0.5, right),
 	}
 	camera := camera.NewCamera(aspectRatio)
-	viewer := canvas.NewCanvas(imageWidth, imageHeight, samplesPerPixel, "go-rtiow")
+	viewer := canvas.NewCanvas(imageWidth, imageHeight, samplesPerPixel)
 	for y := 0; y < imageHeight; y++ {
 		for x := 0; x < imageWidth; x++ {
 			var pixelColor vec3.Vec3
@@ -53,5 +51,5 @@ func main() {
 			viewer.WritePixel(x, y, pixelColor)
 		}
 	}
-	viewer.Run()
+	viewer.WriteImage()
 }
