@@ -22,31 +22,55 @@ func init() {
 	flag.Float64Var(&aspectRatio, "aspect-ratio", 16.0/9.0, "The aspect ratio of render")
 }
 
+func randomScene() hittable.HitList {
+	world := hittable.HitList{}
+	ground := hittable.NewLambertian(0.5, 0.5, 0.5)
+	world = append(world, shapes.NewSphere(0, -1000, 0, 1000, ground))
+
+	for a := -11; a < 11; a++ {
+		for b := -11; b < 11; b++ {
+			chooseMat := rand.Float64()
+			center := vec3.Vec3{float64(a) + 0.9*rand.Float64(), 0.2, float64(b) + 0.9*rand.Float64()}
+			if (center.Sub(vec3.Vec3{4, 0.2, 0}).Length() > 0.9) {
+				var mat hittable.Material
+				if chooseMat < 0.8 {
+					albedo := vec3.NewRandomVec3().Mul(vec3.NewRandomVec3())
+					mat = hittable.NewLambertian(albedo[0], albedo[1], albedo[2])
+				} else if chooseMat < 0.95 {
+					albedo := vec3.NewRandomRangeVec3(0.5, 1)
+					fuzz := 0.5 * rand.Float64()
+					mat = hittable.NewMetal(albedo[0], albedo[1], albedo[2], fuzz)
+				} else {
+					mat = hittable.NewDieletric(1.5)
+				}
+				world = append(world, shapes.NewSphere(center[0], center[1], center[2], 0.2, mat))
+			}
+		}
+	}
+	mat1 := hittable.NewDieletric(1.5)
+	mat2 := hittable.NewLambertian(0.4, 0.2, 0.1)
+	mat3 := hittable.NewMetal(0.7, 0.6, 0.5, 0)
+	world = append(world, shapes.NewSphere(0, 1, 0, 1, mat1))
+	world = append(world, shapes.NewSphere(-4, 1, 0, 1, mat2))
+	world = append(world, shapes.NewSphere(4, 1, 0, 1, mat3))
+
+	return world
+}
+
 func main() {
 	flag.Parse()
 	imageHeight := int(float64(imageWidth) / aspectRatio)
-	ground := hittable.NewLambertian(0.8, 0.8, 0)
-	center := hittable.NewLambertian(0.1, 0.2, 0.5)
-	left := hittable.NewDieletric(1.5)
-	right := hittable.NewMetal(0.8, 0.6, 0.2, 0)
-	world := hittable.HitList{
-		shapes.NewSphere(0, -100.5, -1, 100, ground),
-		shapes.NewSphere(0, 0, -1, 0.5, center),
-		shapes.NewSphere(-1, 0, -1, 0.5, left),
-		shapes.NewSphere(-1, 0, -1, -0.45, left),
-		shapes.NewSphere(1., 0, -1, 0.5, right),
-	}
-
-	lookFrom := vec3.Vec3{3, 3, 2}
-	lookAt := vec3.Vec3{0, 0, -1}
+	world := randomScene()
+	lookFrom := vec3.Vec3{13, 2, 3}
+	lookAt := vec3.Vec3{0, 0, 0}
 	camera := camera.NewCamera(
 		lookFrom,
 		lookAt,
 		vec3.Vec3{0, 1, 0},
 		aspectRatio,
 		20,
-		2.0,
-		lookFrom.Sub(lookAt).Length(),
+		0.1,
+		10,
 	)
 	viewer := canvas.NewCanvas(imageWidth, imageHeight, samplesPerPixel)
 	for y := 0; y < imageHeight; y++ {
