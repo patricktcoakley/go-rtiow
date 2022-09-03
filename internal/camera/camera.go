@@ -26,12 +26,12 @@ func NewCamera(
 	viewportHeight := 2.0 * h
 	viewportWidth := aspectRatio * viewportHeight
 	w := lookFrom.Sub(lookAt).ToUnit()
-	u := verticalUp.Cross(w).ToUnit()
-	v := w.Cross(u)
+	u := vec3.Cross(verticalUp, w).ToUnit()
+	v := vec3.Cross(w, u)
 
 	origin := lookFrom
-	horizontal := v.MulScalar(viewportWidth)
-	vertical := u.MulScalar(viewportHeight)
+	horizontal := u.MulScalar(viewportWidth)
+	vertical := v.MulScalar(viewportHeight)
 	lowerLeftCorner := origin.Sub(horizontal.DivScalar(2)).Sub(vertical.DivScalar(2)).Sub(w)
 
 	return &Camera{origin, lowerLeftCorner, horizontal, vertical}
@@ -39,11 +39,11 @@ func NewCamera(
 
 func (c *Camera) GetRay(s, t float64) ray.Ray {
 	return ray.Ray{
-		Origin: c.origin, 
-		Direction: c.lowerLeftCorner.Add(c.horizontal.MulScalar(s)).Add(c.vertical.MulScalar(t)).Sub(c.origin),
+		Origin:    c.origin,
+		Direction: c.lowerLeftCorner.Add(c.horizontal.MulScalar(s).Add(c.vertical.MulScalar(t)).Sub(c.origin)),
 	}
 }
 
 func degreesToRadians(degrees float64) float64 {
-	return degrees * (math.Pi / 180)
+	return degrees * math.Pi / 180.0
 }
