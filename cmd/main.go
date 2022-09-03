@@ -33,7 +33,7 @@ func main() {
 		shapes.NewSphere(-r, 0, -1, r, left),
 		shapes.NewSphere(r, 0, -1, r, right),
 	}
-	camera := camera.NewCamera(aspectRatio, 90)
+	camera := camera.NewCamera(vec3.Vec3{-2, 2, 1}, vec3.Vec3{0, 0, -1}, vec3.Vec3{0, 1, 0}, aspectRatio, 90)
 	viewer := canvas.NewCanvas(imageWidth, imageHeight, samplesPerPixel)
 	for y := 0; y < imageHeight; y++ {
 		for x := 0; x < imageWidth; x++ {
