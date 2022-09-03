@@ -41,13 +41,13 @@ func randomScene() hittable.HitList {
 					fuzz := 0.5 * rand.Float64()
 					mat = hittable.NewMetal(albedo[0], albedo[1], albedo[2], fuzz)
 				} else {
-					mat = hittable.NewDieletric(1.5)
+					mat = hittable.NewDielectric(1.5)
 				}
 				world = append(world, shapes.NewSphere(center[0], center[1], center[2], 0.2, mat))
 			}
 		}
 	}
-	mat1 := hittable.NewDieletric(1.5)
+	mat1 := hittable.NewDielectric(1.5)
 	mat2 := hittable.NewLambertian(0.4, 0.2, 0.1)
 	mat3 := hittable.NewMetal(0.7, 0.6, 0.5, 0)
 	world = append(world, shapes.NewSphere(0, 1, 0, 1, mat1))

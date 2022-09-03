@@ -12,7 +12,7 @@ type Dielectric struct {
 	Ir float64
 }
 
-func NewDieletric(ir float64) *Dielectric {
+func NewDielectric(ir float64) *Dielectric {
 	return &Dielectric{ir}
 }
 
