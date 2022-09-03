@@ -36,12 +36,17 @@ func main() {
 		shapes.NewSphere(-1, 0, -1, -0.45, left),
 		shapes.NewSphere(1., 0, -1, 0.5, right),
 	}
+
+	lookFrom := vec3.Vec3{3, 3, 2}
+	lookAt := vec3.Vec3{0, 0, -1}
 	camera := camera.NewCamera(
-		vec3.Vec3{-2, 2, 1},
-		vec3.Vec3{0, 0, -1},
+		lookFrom,
+		lookAt,
 		vec3.Vec3{0, 1, 0},
 		aspectRatio,
 		20,
+		2.0,
+		lookFrom.Sub(lookAt).Length(),
 	)
 	viewer := canvas.NewCanvas(imageWidth, imageHeight, samplesPerPixel)
 	for y := 0; y < imageHeight; y++ {

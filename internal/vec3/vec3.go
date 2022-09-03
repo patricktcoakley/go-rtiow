@@ -151,3 +151,12 @@ func RandomInHempishphere(normal Vec3) Vec3 {
 
 	return inUnitSphere.Neg()
 }
+
+func RandomInUnitDisk() Vec3 {
+	for {
+		p := Vec3{rand.Float64(), rand.Float64(), 0}
+		if p.LengthSquared() < 1 {
+			return p
+		}
+	}
+}

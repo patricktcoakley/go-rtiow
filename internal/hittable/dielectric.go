@@ -28,7 +28,7 @@ func (d *Dielectric) Scatter(rIn ray.Ray, hr *HitRecord, attenuation *vec3.Vec3,
 	sinTheta := math.Sqrt(1 - cosTheta*cosTheta)
 	cannotRefract := refractionRatio*sinTheta > 1.
 	var direction vec3.Vec3
-	if cannotRefract || reflectance(cosTheta, refractionRatio) > rand.Float64(){
+	if cannotRefract || reflectance(cosTheta, refractionRatio) > rand.Float64() {
 		direction = vec3.Reflect(unitDirection, hr.Normal)
 	} else {
 		direction = vec3.Refract(unitDirection, hr.Normal, refractionRatio)
@@ -39,7 +39,7 @@ func (d *Dielectric) Scatter(rIn ray.Ray, hr *HitRecord, attenuation *vec3.Vec3,
 }
 
 func reflectance(cos, refIdx float64) float64 {
-	r0 := 1 - refIdx/(1+refIdx)
+	r0 := (1 - refIdx) / (1 + refIdx)
 	r0 *= r0
 	return r0 + (1-r0)*math.Pow((1-cos), 5)
 }
