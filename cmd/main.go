@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"math"
 	"math/rand"
 
 	"github.com/patricktcoakley/go-rtiow/internal/camera"
@@ -25,19 +26,14 @@ func init() {
 func main() {
 	flag.Parse()
 	imageHeight := int(float64(imageWidth) / aspectRatio)
-	ground := hittable.NewLambertian(0.8, 0.8, 0.0)
-	center := hittable.NewLambertian(0.1, 0.2, 0.5)
-	left := hittable.NewDieletric(1.5)
-	right := hittable.NewMetal(0.8, 0.6, 0.2, 0.0)
-
+	r := math.Cos(math.Pi / 4)
+	left := hittable.NewLambertian(0, 0, 1)
+	right := hittable.NewLambertian(1, 0, 0)
 	world := hittable.HitList{
-		shapes.NewSphere(0, -100.5, -1, 100, ground),
-		shapes.NewSphere(0, 0, -1, 0.5, center),
-		shapes.NewSphere(-1., 0, -1, 0.5, left),
-		shapes.NewSphere(-1., 0, -1, -0.4, left),
-		shapes.NewSphere(1., 0, -1, 0.5, right),
+		shapes.NewSphere(-r, 0, -1, r, left),
+		shapes.NewSphere(r, 0, -1, r, right),
 	}
-	camera := camera.NewCamera(aspectRatio)
+	camera := camera.NewCamera(aspectRatio, 90)
 	viewer := canvas.NewCanvas(imageWidth, imageHeight, samplesPerPixel)
 	for y := 0; y < imageHeight; y++ {
 		for x := 0; x < imageWidth; x++ {
