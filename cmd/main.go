@@ -15,11 +15,13 @@ import (
 var samplesPerPixel int
 var imageWidth int
 var aspectRatio float64
+var jobs int
 
 func init() {
 	flag.IntVar(&samplesPerPixel, "samples", 100, "Number of samples per pixel")
 	flag.IntVar(&imageWidth, "width", 400, "Width of render")
 	flag.Float64Var(&aspectRatio, "aspect-ratio", 16.0/9.0, "The aspect ratio of render")
+	flag.IntVar(&jobs, "jobs", 10, "The number of jobs")
 }
 
 func randomScene() hittable.HitList {
@@ -47,12 +49,10 @@ func randomScene() hittable.HitList {
 			}
 		}
 	}
-	mat1 := hittable.NewDielectric(1.5)
-	mat2 := hittable.NewLambertian(0.4, 0.2, 0.1)
-	mat3 := hittable.NewMetal(0.7, 0.6, 0.5, 0)
-	world = append(world, shapes.NewSphere(0, 1, 0, 1, mat1))
-	world = append(world, shapes.NewSphere(-4, 1, 0, 1, mat2))
-	world = append(world, shapes.NewSphere(4, 1, 0, 1, mat3))
+	mats := []hittable.Material{hittable.NewDielectric(1.5), hittable.NewLambertian(rand.Float64(), rand.Float64(), rand.Float64()), hittable.NewMetal(0.7, 0.6, 0.5, 0)}
+	world = append(world, shapes.NewSphere(0, 1, 0, 1, mats[rand.Intn(2)]))
+	world = append(world, shapes.NewSphere(-4, 1, 0, 1, mats[rand.Intn(2)]))
+	world = append(world, shapes.NewSphere(4, 1, 0, 1, mats[rand.Intn(2)]))
 
 	return world
 }
@@ -73,17 +73,29 @@ func main() {
 		10,
 	)
 	viewer := canvas.NewCanvas(imageWidth, imageHeight, samplesPerPixel)
+	type coord struct{ x, y int }
+	ch := make(chan coord)
+
+	for job := 1; job <= jobs; job++ {
+		go func() {
+			for c := range ch {
+				var pixelColor vec3.Vec3
+				for s := 0; s < samplesPerPixel; s++ {
+					u := (float64(c.x) + rand.Float64()) / float64(imageWidth-1)
+					v := (float64(c.y) + rand.Float64()) / float64(imageHeight-1)
+					r := camera.GetRay(u, v)
+					pixelColor = vec3.Add(pixelColor, tracer.RayColor(r, world))
+				}
+				viewer.WritePixel(c.x, c.y, pixelColor)
+			}
+		}()
+	}
+
 	for y := 0; y < imageHeight; y++ {
 		for x := 0; x < imageWidth; x++ {
-			var pixelColor vec3.Vec3
-			for s := 0; s < samplesPerPixel; s++ {
-				u := (float64(x) + rand.Float64()) / float64(imageWidth-1)
-				v := (float64(y) + rand.Float64()) / float64(imageHeight-1)
-				r := camera.GetRay(u, v)
-				pixelColor = vec3.Add(pixelColor, tracer.RayColor(r, world))
-			}
-			viewer.WritePixel(x, y, pixelColor)
+			ch <- coord{x, y}
 		}
 	}
+
 	viewer.WriteImage()
 }
