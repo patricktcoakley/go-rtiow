@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"math/rand"
+	"runtime"
 
 	"github.com/patricktcoakley/go-rtiow/internal/camera"
 	"github.com/patricktcoakley/go-rtiow/internal/canvas"
@@ -21,7 +22,7 @@ func init() {
 	flag.IntVar(&samplesPerPixel, "samples", 100, "Number of samples per pixel")
 	flag.IntVar(&imageWidth, "width", 400, "Width of render")
 	flag.Float64Var(&aspectRatio, "aspect-ratio", 16.0/9.0, "The aspect ratio of render")
-	flag.IntVar(&jobs, "jobs", 10, "The number of jobs")
+	flag.IntVar(&jobs, "jobs", runtime.GOMAXPROCS(0), "The number of jobs")
 }
 
 func randomScene() hittable.HitList {
