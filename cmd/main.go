@@ -4,6 +4,7 @@ import (
 	"flag"
 	"math/rand"
 	"runtime"
+	"time"
 
 	"github.com/patricktcoakley/go-rtiow/internal/camera"
 	"github.com/patricktcoakley/go-rtiow/internal/canvas"
@@ -50,16 +51,19 @@ func randomScene() hittable.HitList {
 			}
 		}
 	}
-	mats := []hittable.Material{hittable.NewDielectric(1.5), hittable.NewLambertian(rand.Float64(), rand.Float64(), rand.Float64()), hittable.NewMetal(0.7, 0.6, 0.5, 0)}
-	world = append(world, shapes.NewSphere(0, 1, 0, 1, mats[rand.Intn(2)]))
-	world = append(world, shapes.NewSphere(-4, 1, 0, 1, mats[rand.Intn(2)]))
-	world = append(world, shapes.NewSphere(4, 1, 0, 1, mats[rand.Intn(2)]))
+	mat1 := hittable.NewDielectric(1.5)
+	mat2 := hittable.NewLambertian(0.4, 0.2, 0.1)
+	mat3 := hittable.NewMetal(0.7, 0.6, 0.5, 0)
+	world = append(world, shapes.NewSphere(0, 1, 0, 1, mat1))
+	world = append(world, shapes.NewSphere(-4, 1, 0, 1, mat2))
+	world = append(world, shapes.NewSphere(4, 1, 0, 1, mat3))
 
 	return world
 }
 
 func main() {
 	flag.Parse()
+	rand.Seed(time.Now().UnixNano())
 	imageHeight := int(float64(imageWidth) / aspectRatio)
 	world := randomScene()
 	lookFrom := vec3.Vec3{13, 2, 3}
