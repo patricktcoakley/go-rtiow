@@ -10,9 +10,9 @@ import (
 
 const maxDepth int = 50
 
-func RayColor(r ray.Ray, world hittable.Hittable) vec3.Vec3 {
+func RayColor(r ray.Ray, obj hittable.Hittable) vec3.Vec3 {
 	var hr hittable.HitRecord
-	return rayColor(r, world, &hr, maxDepth-1)
+	return rayColor(r, obj, &hr, maxDepth-1)
 }
 
 func rayColor(r ray.Ray, obj hittable.Hittable, hr *hittable.HitRecord, depth int) vec3.Vec3 {
