@@ -4,6 +4,7 @@ import (
 	"flag"
 	"math/rand"
 	"runtime"
+	"sync"
 	"time"
 
 	"github.com/patricktcoakley/go-rtiow/internal/camera"
@@ -78,28 +79,46 @@ func main() {
 		10,
 	)
 	viewer := canvas.NewCanvas(imageWidth, imageHeight, samplesPerPixel)
-	type coord struct{ x, y int }
-	ch := make(chan coord)
-
-	for job := 1; job <= jobs; job++ {
-		go func() {
-			for c := range ch {
-				var pixelColor vec3.Vec3
-				for s := 0; s < samplesPerPixel; s++ {
-					u := (float64(c.x) + rand.Float64()) / float64(imageWidth-1)
-					v := (float64(c.y) + rand.Float64()) / float64(imageHeight-1)
-					r := camera.GetRay(u, v)
-					pixelColor = vec3.Add(pixelColor, tracer.RayColor(r, world))
-				}
-				viewer.WritePixel(c.x, c.y, pixelColor)
-			}
-		}()
+	type coord struct {
+		x, y  int
+		color vec3.Vec3
 	}
+	coords := make(chan coord)
+	pixels := make(chan coord)
 
-	for y := 0; y < imageHeight; y++ {
-		for x := 0; x < imageWidth; x++ {
-			ch <- coord{x, y}
+	go func() {
+		for y := 0; y < imageHeight; y++ {
+			for x := 0; x < imageWidth; x++ {
+				coords <- coord{x, y, vec3.Vec3{}}
+			}
 		}
+		close(coords)
+	}()
+
+	go func() {
+		var wg sync.WaitGroup
+		wg.Add(jobs)
+		for job := 1; job <= jobs; job++ {
+			go func() {
+				defer wg.Done()
+				for c := range coords {
+					var pixelColor vec3.Vec3
+					for s := 0; s < samplesPerPixel; s++ {
+						u := (float64(c.x) + rand.Float64()) / float64(imageWidth-1)
+						v := (float64(c.y) + rand.Float64()) / float64(imageHeight-1)
+						r := camera.GetRay(u, v)
+						pixelColor = vec3.Add(pixelColor, tracer.RayColor(r, world))
+					}
+					pixels <- coord{c.x, c.y, pixelColor}
+				}
+			}()
+		}
+		wg.Wait()
+		close(pixels)
+	}()
+
+	for c := range pixels {
+		viewer.WritePixel(c.x, c.y, c.color)
 	}
 
 	viewer.WriteImage()
