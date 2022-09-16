@@ -35,20 +35,20 @@ func randomScene() hittable.HitList {
 	for a := -11; a < 11; a++ {
 		for b := -11; b < 11; b++ {
 			chooseMat := rand.Float64()
-			center := vec3.Vec3{float64(a) + 0.9*rand.Float64(), 0.2, float64(b) + 0.9*rand.Float64()}
-			if (center.Sub(vec3.Vec3{4, 0.2, 0}).Length() > 0.9) {
+			center := vec3.Vec3{X: float64(a) + 0.9*rand.Float64(), Y: 0.2, Z: float64(b) + 0.9*rand.Float64()}
+			if (center.Sub(vec3.Vec3{X: 4, Y: 0.2, Z: 0}).Length() > 0.9) {
 				var mat hittable.Material
 				if chooseMat < 0.8 {
 					albedo := vec3.NewRandomVec3().Mul(vec3.NewRandomVec3())
-					mat = hittable.NewLambertian(albedo[0], albedo[1], albedo[2])
+					mat = hittable.NewLambertian(albedo.X, albedo.Y, albedo.Z)
 				} else if chooseMat < 0.95 {
 					albedo := vec3.NewRandomRangeVec3(0.5, 1)
 					fuzz := 0.5 * rand.Float64()
-					mat = hittable.NewMetal(albedo[0], albedo[1], albedo[2], fuzz)
+					mat = hittable.NewMetal(albedo.X, albedo.Y, albedo.Z, fuzz)
 				} else {
 					mat = hittable.NewDielectric(1.5)
 				}
-				world = append(world, shapes.NewSphere(center[0], center[1], center[2], 0.2, mat))
+				world = append(world, shapes.NewSphere(center.X, center.Y, center.Z, 0.2, mat))
 			}
 		}
 	}
@@ -67,12 +67,12 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 	imageHeight := int(float64(imageWidth) / aspectRatio)
 	world := randomScene()
-	lookFrom := vec3.Vec3{13, 2, 3}
-	lookAt := vec3.Vec3{0, 0, 0}
+	lookFrom := vec3.Vec3{X: 13, Y: 2, Z: 3}
+	lookAt := vec3.Vec3{X: 0, Y: 0, Z: 0}
 	camera := camera.NewCamera(
 		lookFrom,
 		lookAt,
-		vec3.Vec3{0, 1, 0},
+		vec3.Vec3{X: 0, Y: 1, Z: 0},
 		aspectRatio,
 		20,
 		0.1,

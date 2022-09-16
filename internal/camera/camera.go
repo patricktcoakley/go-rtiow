@@ -55,7 +55,7 @@ func NewCamera(
 
 func (c *Camera) GetRay(s, t float64) ray.Ray {
 	rd := vec3.RandomInUnitDisk().MulScalar(c.lensRadius)
-	offset := c.u.MulScalar(rd[0]).Add(c.v.MulScalar(rd[1]))
+	offset := c.u.MulScalar(rd.X).Add(c.v.MulScalar(rd.Y))
 	return ray.Ray{
 		Origin:    c.origin.Add(offset),
 		Direction: c.lowerLeftCorner.Add(c.horizontal.MulScalar(s).Add(c.vertical.MulScalar(t)).Sub(c.origin)).Sub(offset),

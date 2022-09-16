@@ -50,9 +50,9 @@ func (c *Canvas) WriteImage() {
 
 func newColorFromVec3(v vec3.Vec3, scale float64) color.RGBA {
 	return color.RGBA{
-		uint8(clamp(math.Sqrt(v[0]*scale)) * 256),
-		uint8(clamp(math.Sqrt(v[1]*scale)) * 256),
-		uint8(clamp(math.Sqrt(v[2]*scale)) * 256),
+		uint8(clamp(math.Sqrt(v.X*scale)) * 256),
+		uint8(clamp(math.Sqrt(v.Y*scale)) * 256),
+		uint8(clamp(math.Sqrt(v.Z*scale)) * 256),
 		255,
 	}
 }

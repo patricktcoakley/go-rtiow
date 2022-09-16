@@ -5,10 +5,12 @@ import (
 	"math/rand"
 )
 
-type Vec3 [3]float64
+type Vec3 struct {
+	X, Y, Z float64
+}
 
 func (v Vec3) Neg() Vec3 {
-	return Vec3{-v[0], -v[1], -v[2]}
+	return Vec3{-v.X, -v.Y, -v.Z}
 }
 
 func (v Vec3) Length() float64 {
@@ -24,7 +26,7 @@ func (v Vec3) ToUnit() Vec3 {
 }
 
 func Add(lhs, rhs Vec3) Vec3 {
-	return Vec3{lhs[0] + rhs[0], lhs[1] + rhs[1], lhs[2] + rhs[2]}
+	return Vec3{lhs.X + rhs.X, lhs.Y + rhs.Y, lhs.Z + rhs.Z}
 }
 
 func (v Vec3) Add(rhs Vec3) Vec3 {
@@ -32,7 +34,7 @@ func (v Vec3) Add(rhs Vec3) Vec3 {
 }
 
 func Sub(lhs, rhs Vec3) Vec3 {
-	return Vec3{lhs[0] - rhs[0], lhs[1] - rhs[1], lhs[2] - rhs[2]}
+	return Vec3{lhs.X - rhs.X, lhs.Y - rhs.Y, lhs.Z - rhs.Z}
 }
 
 func (v Vec3) Sub(rhs Vec3) Vec3 {
@@ -40,7 +42,7 @@ func (v Vec3) Sub(rhs Vec3) Vec3 {
 }
 
 func Mul(lhs, rhs Vec3) Vec3 {
-	return Vec3{lhs[0] * rhs[0], lhs[1] * rhs[1], lhs[2] * rhs[2]}
+	return Vec3{lhs.X * rhs.X, lhs.Y * rhs.Y, lhs.Z * rhs.Z}
 }
 
 func (v Vec3) Mul(rhs Vec3) Vec3 {
@@ -48,7 +50,7 @@ func (v Vec3) Mul(rhs Vec3) Vec3 {
 }
 
 func MulScalar(lhs Vec3, rhs float64) Vec3 {
-	return Vec3{lhs[0] * rhs, lhs[1] * rhs, lhs[2] * rhs}
+	return Vec3{lhs.X * rhs, lhs.Y * rhs, lhs.Z * rhs}
 }
 
 func (v Vec3) MulScalar(rhs float64) Vec3 {
@@ -56,7 +58,7 @@ func (v Vec3) MulScalar(rhs float64) Vec3 {
 }
 
 func Div(lhs, rhs Vec3) Vec3 {
-	return Vec3{lhs[0] / rhs[0], lhs[1] / rhs[1], lhs[2] / rhs[2]}
+	return Vec3{lhs.X / rhs.X, lhs.Y / rhs.Y, lhs.Z / rhs.Z}
 }
 
 func (v Vec3) Div(rhs Vec3) Vec3 {
@@ -65,7 +67,7 @@ func (v Vec3) Div(rhs Vec3) Vec3 {
 
 func DivScalar(lhs Vec3, rhs float64) Vec3 {
 	rhs = 1.0 / rhs
-	return Vec3{lhs[0] * rhs, lhs[1] * rhs, lhs[2] * rhs}
+	return Vec3{lhs.X * rhs, lhs.Y * rhs, lhs.Z * rhs}
 }
 
 func (v Vec3) DivScalar(rhs float64) Vec3 {
@@ -73,7 +75,7 @@ func (v Vec3) DivScalar(rhs float64) Vec3 {
 }
 
 func Dot(lhs, rhs Vec3) float64 {
-	return lhs[0]*rhs[0] + lhs[1]*rhs[1] + lhs[2]*rhs[2]
+	return lhs.X*rhs.X + lhs.Y*rhs.Y + lhs.Z*rhs.Z
 }
 
 func (v Vec3) Dot(rhs Vec3) float64 {
@@ -82,9 +84,9 @@ func (v Vec3) Dot(rhs Vec3) float64 {
 
 func Cross(lhs, rhs Vec3) Vec3 {
 	return Vec3{
-		lhs[1]*rhs[2] - lhs[2]*rhs[1],
-		lhs[2]*rhs[0] - lhs[0]*rhs[2],
-		lhs[0]*rhs[1] - lhs[1]*rhs[0],
+		lhs.Y*rhs.Z - lhs.Z*rhs.Y,
+		lhs.Z*rhs.X - lhs.X*rhs.Z,
+		lhs.X*rhs.Y - lhs.Y*rhs.X,
 	}
 }
 
@@ -94,7 +96,7 @@ func (v Vec3) Cross(rhs Vec3) Vec3 {
 
 func (v Vec3) NearZero() bool {
 	s := 1e-8
-	return math.Abs(v[0]) < s && math.Abs(v[1]) < s && math.Abs(v[2]) < s
+	return math.Abs(v.X) < s && math.Abs(v.Y) < s && math.Abs(v.Z) < s
 }
 
 func Reflect(lhs, rhs Vec3) Vec3 {

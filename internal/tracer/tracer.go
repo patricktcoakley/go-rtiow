@@ -28,9 +28,9 @@ func rayColor(r ray.Ray, obj hittable.Hittable, hr *hittable.HitRecord, depth in
 		return vec3.Vec3{}
 	}
 
-	t := (r.Direction.ToUnit()[1] + 1.0) * 0.5
+	t := (r.Direction.ToUnit().Y + 1.0) * 0.5
 	return vec3.Add(
-		vec3.MulScalar(vec3.Vec3{1, 1, 1}, 1.0-t),
-		vec3.MulScalar(vec3.Vec3{0.5, 0.7, 1.0}, t),
+		vec3.MulScalar(vec3.Vec3{X: 1, Y: 1, Z: 1}, 1.0-t),
+		vec3.MulScalar(vec3.Vec3{X: 0.5, Y: 0.7, Z: 1.0}, t),
 	)
 }
