@@ -15,7 +15,7 @@ type Sphere struct {
 }
 
 func NewSphere(centerX, centerY, centerZ, radius float64, material hittable.Material) *Sphere {
-	v := vec3.Vec3{centerX, centerY, centerZ}
+	v := vec3.Vec3{X: centerX, Y: centerY, Z: centerZ}
 	return &Sphere{v, radius, material}
 }
 

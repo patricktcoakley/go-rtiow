@@ -10,7 +10,7 @@ type Lambertian struct {
 }
 
 func NewLambertian(r, g, b float64) *Lambertian {
-	return &Lambertian{vec3.Vec3{r, g, b}}
+	return &Lambertian{vec3.Vec3{X: r, Y: g, Z: b}}
 }
 
 func (l *Lambertian) Scatter(rIn ray.Ray, hr *HitRecord, attenuation *vec3.Vec3, scattered *ray.Ray) bool {

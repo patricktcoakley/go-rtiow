@@ -14,7 +14,7 @@ func NewMetal(r, g, b, fuzziness float64) *Metal {
 	if fuzziness >= 1 {
 		fuzziness = 1
 	}
-	return &Metal{vec3.Vec3{r, g, b}, fuzziness}
+	return &Metal{vec3.Vec3{X: r, Y: g, Z: b}, fuzziness}
 }
 
 func (m *Metal) Scatter(rIn ray.Ray, hr *HitRecord, attenuation *vec3.Vec3, scattered *ray.Ray) bool {

@@ -17,7 +17,7 @@ func NewDielectric(ir float64) *Dielectric {
 }
 
 func (d *Dielectric) Scatter(rIn ray.Ray, hr *HitRecord, attenuation *vec3.Vec3, scattered *ray.Ray) bool {
-	*attenuation = vec3.Vec3{1, 1, 1}
+	*attenuation = vec3.Vec3{X: 1, Y: 1, Z: 1}
 	refractionRatio := d.Ir
 	if hr.FrontFace {
 		refractionRatio = 1 / d.Ir

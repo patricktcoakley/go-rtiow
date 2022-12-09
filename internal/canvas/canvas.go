@@ -25,12 +25,12 @@ func NewCanvas(width, height, samplesPerPixel int) *Canvas {
 	}
 }
 
-func (c *Canvas) pixelOffset(x, y int) int {
+func (c Canvas) pixelOffset(x, y int) int {
 	y = c.height - y - 1
 	return 4 * (y*c.width + x)
 }
 
-func (c *Canvas) WritePixel(x, y int, color vec3.Vec3) {
+func (c Canvas) WritePixel(x, y int, color vec3.Vec3) {
 	scale := 1 / c.samplesPerPixel
 	pixelColor := newColorFromVec3(color, scale)
 	offset := c.pixelOffset(x, y)
@@ -40,7 +40,7 @@ func (c *Canvas) WritePixel(x, y int, color vec3.Vec3) {
 	c.img.Pix[offset+3] = pixelColor.A
 }
 
-func (c *Canvas) WriteImage() {
+func (c Canvas) WriteImage() {
 	f, err := os.Create("out.png")
 	if err != nil {
 		panic(err)
