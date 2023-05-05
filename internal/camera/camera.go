@@ -1,8 +1,7 @@
 package camera
 
 import (
-	"math"
-
+	"github.com/patricktcoakley/go-rtiow/internal/math"
 	"github.com/patricktcoakley/go-rtiow/internal/ray"
 	"github.com/patricktcoakley/go-rtiow/internal/vec3"
 )
@@ -15,7 +14,7 @@ type Camera struct {
 	u               vec3.Vec3
 	v               vec3.Vec3
 	w               vec3.Vec3
-	lensRadius      float64
+	lensRadius      math.Real
 }
 
 func NewCamera(
@@ -25,10 +24,10 @@ func NewCamera(
 	aspectRatio,
 	verticalFov,
 	aperture,
-	focusDistance float64) *Camera {
+	focusDistance math.Real) *Camera {
 
 	theta := degreesToRadians(verticalFov)
-	h := math.Tan(theta / 2)
+	h := math.Tan(theta / 2.0)
 	viewportHeight := 2.0 * h
 	viewportWidth := aspectRatio * viewportHeight
 
@@ -53,7 +52,7 @@ func NewCamera(
 	}
 }
 
-func (c *Camera) GetRay(s, t float64) ray.Ray {
+func (c *Camera) GetRay(s, t math.Real) ray.Ray {
 	rd := vec3.RandomInUnitDisk().MulScalar(c.lensRadius)
 	offset := c.u.MulScalar(rd.X).Add(c.v.MulScalar(rd.Y))
 	return ray.Ray{
@@ -62,6 +61,6 @@ func (c *Camera) GetRay(s, t float64) ray.Ray {
 	}
 }
 
-func degreesToRadians(degrees float64) float64 {
+func degreesToRadians(degrees math.Real) math.Real {
 	return degrees * math.Pi / 180.0
 }

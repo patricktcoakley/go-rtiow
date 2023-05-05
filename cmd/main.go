@@ -2,17 +2,15 @@ package main
 
 import (
 	"flag"
-	"math/rand"
-	"runtime"
-	"sync"
-	"time"
-
 	"github.com/patricktcoakley/go-rtiow/internal/camera"
 	"github.com/patricktcoakley/go-rtiow/internal/canvas"
 	"github.com/patricktcoakley/go-rtiow/internal/hittable"
+	"github.com/patricktcoakley/go-rtiow/internal/math"
 	"github.com/patricktcoakley/go-rtiow/internal/shapes"
 	"github.com/patricktcoakley/go-rtiow/internal/tracer"
 	"github.com/patricktcoakley/go-rtiow/internal/vec3"
+	"runtime"
+	"sync"
 )
 
 var samplesPerPixel int
@@ -34,8 +32,8 @@ func randomScene() hittable.HitList {
 
 	for a := -11; a < 11; a++ {
 		for b := -11; b < 11; b++ {
-			chooseMat := rand.Float64()
-			center := vec3.Vec3{X: float64(a) + 0.9*rand.Float64(), Y: 0.2, Z: float64(b) + 0.9*rand.Float64()}
+			chooseMat := math.Random()
+			center := vec3.Vec3{X: math.Real(a) + 0.9*math.Random(), Y: 0.2, Z: math.Real(b) + 0.9*math.Random()}
 			if (center.Sub(vec3.Vec3{X: 4, Y: 0.2, Z: 0}).Length() > 0.9) {
 				var mat hittable.Material
 				if chooseMat < 0.8 {
@@ -43,7 +41,7 @@ func randomScene() hittable.HitList {
 					mat = hittable.NewLambertian(albedo.X, albedo.Y, albedo.Z)
 				} else if chooseMat < 0.95 {
 					albedo := vec3.NewRandomRangeVec3(0.5, 1)
-					fuzz := 0.5 * rand.Float64()
+					fuzz := 0.5 * math.Random()
 					mat = hittable.NewMetal(albedo.X, albedo.Y, albedo.Z, fuzz)
 				} else {
 					mat = hittable.NewDielectric(1.5)
@@ -64,12 +62,12 @@ func randomScene() hittable.HitList {
 
 func main() {
 	flag.Parse()
-	rand.Seed(time.Now().UnixNano())
-	imageHeight := int(float64(imageWidth) / aspectRatio)
+	aspectRatio := math.Real(aspectRatio)
+	imageHeight := int(math.Real(imageWidth) / aspectRatio)
 	world := randomScene()
 	lookFrom := vec3.Vec3{X: 13, Y: 2, Z: 3}
 	lookAt := vec3.Vec3{X: 0, Y: 0, Z: 0}
-	camera := camera.NewCamera(
+	cam := camera.NewCamera(
 		lookFrom,
 		lookAt,
 		vec3.Vec3{X: 0, Y: 1, Z: 0},
@@ -104,9 +102,9 @@ func main() {
 				for c := range coords {
 					var pixelColor vec3.Vec3
 					for s := 0; s < samplesPerPixel; s++ {
-						u := (float64(c.x) + rand.Float64()) / float64(imageWidth-1)
-						v := (float64(c.y) + rand.Float64()) / float64(imageHeight-1)
-						r := camera.GetRay(u, v)
+						u := (math.Real(c.x) + math.Random()) / math.Real(imageWidth-1)
+						v := (math.Real(c.y) + math.Random()) / math.Real(imageHeight-1)
+						r := cam.GetRay(u, v)
 						pixelColor = vec3.Add(pixelColor, tracer.RayColor(r, world))
 					}
 					pixels <- coord{c.x, c.y, pixelColor}

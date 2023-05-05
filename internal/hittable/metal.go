@@ -1,16 +1,17 @@
 package hittable
 
 import (
+	"github.com/patricktcoakley/go-rtiow/internal/math"
 	"github.com/patricktcoakley/go-rtiow/internal/ray"
 	"github.com/patricktcoakley/go-rtiow/internal/vec3"
 )
 
 type Metal struct {
 	Albedo    vec3.Vec3
-	fuzziness float64
+	fuzziness math.Real
 }
 
-func NewMetal(r, g, b, fuzziness float64) *Metal {
+func NewMetal(r, g, b, fuzziness math.Real) *Metal {
 	if fuzziness >= 1 {
 		fuzziness = 1
 	}

@@ -1,9 +1,8 @@
 package tracer
 
 import (
-	"math"
-
 	"github.com/patricktcoakley/go-rtiow/internal/hittable"
+	"github.com/patricktcoakley/go-rtiow/internal/math"
 	"github.com/patricktcoakley/go-rtiow/internal/ray"
 	"github.com/patricktcoakley/go-rtiow/internal/vec3"
 )
@@ -18,7 +17,7 @@ func rayColor(r ray.Ray, obj hittable.Hittable, hr *hittable.HitRecord, depth in
 	if depth <= 0 {
 		return vec3.Vec3{}
 	}
-	if obj.Hit(r, 0.001, math.MaxFloat64, hr) {
+	if obj.Hit(r, 0.001, math.MaxReal, hr) {
 		scattered := ray.Ray{}
 		attenuation := vec3.Vec3{}
 		if hr.Material.Scatter(r, hr, &attenuation, &scattered) {

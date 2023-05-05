@@ -1,6 +1,7 @@
 package hittable
 
 import (
+	"github.com/patricktcoakley/go-rtiow/internal/math"
 	"github.com/patricktcoakley/go-rtiow/internal/ray"
 	"github.com/patricktcoakley/go-rtiow/internal/vec3"
 )
@@ -9,7 +10,7 @@ type HitRecord struct {
 	Point     vec3.Vec3
 	Normal    vec3.Vec3
 	Material  Material
-	T         float64
+	T         math.Real
 	FrontFace bool
 }
 

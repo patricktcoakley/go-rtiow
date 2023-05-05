@@ -4,15 +4,15 @@ import (
 	"image"
 	"image/color"
 	"image/png"
-	"math"
 	"os"
 
+	"github.com/patricktcoakley/go-rtiow/internal/math"
 	"github.com/patricktcoakley/go-rtiow/internal/vec3"
 )
 
 type Canvas struct {
 	width, height   int
-	samplesPerPixel float64
+	samplesPerPixel math.Real
 	img             *image.RGBA
 }
 
@@ -20,7 +20,7 @@ func NewCanvas(width, height, samplesPerPixel int) *Canvas {
 	return &Canvas{
 		width,
 		height,
-		float64(samplesPerPixel),
+		math.Real(samplesPerPixel),
 		image.NewRGBA(image.Rect(0, 0, width, height)),
 	}
 }
@@ -45,19 +45,22 @@ func (c Canvas) WriteImage() {
 	if err != nil {
 		panic(err)
 	}
-	png.Encode(f, c.img)
-}
-
-func newColorFromVec3(v vec3.Vec3, scale float64) color.RGBA {
-	return color.RGBA{
-		uint8(clamp(math.Sqrt(v.X*scale)) * 256),
-		uint8(clamp(math.Sqrt(v.Y*scale)) * 256),
-		uint8(clamp(math.Sqrt(v.Z*scale)) * 256),
-		255,
+	err = png.Encode(f, c.img)
+	if err != nil {
+		panic(err)
 	}
 }
 
-func clamp(x float64) float64 {
+func newColorFromVec3(v vec3.Vec3, scale math.Real) color.RGBA {
+	return color.RGBA{
+		R: uint8(clamp(math.Sqrt(v.X*scale)) * 256),
+		G: uint8(clamp(math.Sqrt(v.Y*scale)) * 256),
+		B: uint8(clamp(math.Sqrt(v.Z*scale)) * 256),
+		A: 255,
+	}
+}
+
+func clamp(x math.Real) math.Real {
 	if x < 0.0 {
 		return 0.0
 	}

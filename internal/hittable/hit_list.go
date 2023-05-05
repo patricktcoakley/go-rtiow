@@ -1,10 +1,13 @@
 package hittable
 
-import "github.com/patricktcoakley/go-rtiow/internal/ray"
+import (
+	"github.com/patricktcoakley/go-rtiow/internal/math"
+	"github.com/patricktcoakley/go-rtiow/internal/ray"
+)
 
 type HitList []Hittable
 
-func (hl HitList) Hit(r ray.Ray, tMin, tMax float64, hr *HitRecord) bool {
+func (hl HitList) Hit(r ray.Ray, tMin, tMax math.Real, hr *HitRecord) bool {
 	var tempHr HitRecord
 	hitAnything := false
 	closestSoFar := tMax
