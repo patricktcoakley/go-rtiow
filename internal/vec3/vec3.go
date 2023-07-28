@@ -105,11 +105,11 @@ func Reflect(lhs, rhs Vec3) Vec3 {
 	)
 }
 
-func Refract(uv, n Vec3, etai_over_etat math.Real) Vec3 {
+func Refract(uv, n Vec3, etaiOverEtat math.Real) Vec3 {
 	cosTheta := math.Min(Dot(uv.Neg(), n), 1.0)
 	rOutPerp := MulScalar(
 		Add(uv, MulScalar(n, cosTheta)),
-		etai_over_etat,
+		etaiOverEtat,
 	)
 
 	rOutParallel := MulScalar(

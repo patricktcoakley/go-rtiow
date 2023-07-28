@@ -14,7 +14,7 @@ func NewLambertian(r, g, b math.Real) *Lambertian {
 	return &Lambertian{vec3.Vec3{X: r, Y: g, Z: b}}
 }
 
-func (l *Lambertian) Scatter(rIn ray.Ray, hr *HitRecord, attenuation *vec3.Vec3, scattered *ray.Ray) bool {
+func (l *Lambertian) Scatter(_ ray.Ray, hr *HitRecord, attenuation *vec3.Vec3, scattered *ray.Ray) bool {
 	scatterDirection := hr.Normal.Add(vec3.NewRandomUnitVector())
 	if scatterDirection.NearZero() {
 		scatterDirection = hr.Normal
