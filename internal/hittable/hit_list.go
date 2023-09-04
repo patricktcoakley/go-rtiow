@@ -9,7 +9,7 @@ type HitList []Hittable
 
 func (hl HitList) Hit(r ray.Ray, tMin, tMax math.Real, hr *HitRecord) bool {
 	var tempHr HitRecord
-	hitAnything := false
+	var hitAnything bool
 	closestSoFar := tMax
 
 	for _, object := range hl {

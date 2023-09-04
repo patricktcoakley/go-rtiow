@@ -10,16 +10,16 @@ import (
 const maxDepth int = 50
 
 func RayColor(r ray.Ray, obj hittable.Hittable) vec3.Vec3 {
-	return rayColor(r, obj, &hittable.HitRecord{}, maxDepth-1)
+	return rayColor(r, obj, &hittable.HitRecord{}, maxDepth)
 }
 
 func rayColor(r ray.Ray, obj hittable.Hittable, hr *hittable.HitRecord, depth int) vec3.Vec3 {
 	if depth <= 0 {
 		return vec3.Vec3{}
 	}
-	if obj.Hit(r, 0.001, math.MaxReal, hr) {
-		scattered := ray.Ray{}
-		attenuation := vec3.Vec3{}
+	if obj.Hit(r, math.MinReal, math.MaxReal, hr) {
+		var scattered ray.Ray
+		var attenuation vec3.Vec3
 		if hr.Material.Scatter(r, hr, &attenuation, &scattered) {
 			return vec3.Mul(attenuation, rayColor(scattered, obj, hr, depth-1))
 		}

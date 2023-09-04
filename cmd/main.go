@@ -60,34 +60,38 @@ func randomScene() hittable.HitList {
 	return world
 }
 
+type coord struct{ x, y int }
+
+type pixel struct {
+	coord
+	color vec3.Vec3
+}
+
 func main() {
 	flag.Parse()
 	aspectRatio := math.Real(aspectRatio)
 	imageHeight := int(math.Real(imageWidth) / aspectRatio)
 	world := randomScene()
 	lookFrom := vec3.Vec3{X: 13, Y: 2, Z: 3}
-	lookAt := vec3.Vec3{X: 0, Y: 0, Z: 0}
+	lookAt := vec3.Vec3{}
 	cam := camera.NewCamera(
 		lookFrom,
 		lookAt,
-		vec3.Vec3{X: 0, Y: 1, Z: 0},
+		vec3.Vec3{Y: 1},
 		aspectRatio,
 		20,
 		0.1,
 		10,
 	)
 	viewer := canvas.NewCanvas(imageWidth, imageHeight, samplesPerPixel)
-	type coord struct {
-		x, y  int
-		color vec3.Vec3
-	}
+
 	coords := make(chan coord)
-	pixels := make(chan coord)
+	pixels := make(chan pixel)
 
 	go func() {
 		for y := 0; y < imageHeight; y++ {
 			for x := 0; x < imageWidth; x++ {
-				coords <- coord{x, y, vec3.Vec3{}}
+				coords <- coord{x, y}
 			}
 		}
 		close(coords)
@@ -107,7 +111,7 @@ func main() {
 						r := cam.GetRay(u, v)
 						pixelColor = vec3.Add(pixelColor, tracer.RayColor(r, world))
 					}
-					pixels <- coord{c.x, c.y, pixelColor}
+					pixels <- pixel{coord{c.x, c.y}, pixelColor}
 				}
 			}()
 		}
@@ -115,8 +119,8 @@ func main() {
 		close(pixels)
 	}()
 
-	for c := range pixels {
-		viewer.WritePixel(c.x, c.y, c.color)
+	for p := range pixels {
+		viewer.WritePixel(p.x, p.y, p.color)
 	}
 
 	viewer.WriteImage()

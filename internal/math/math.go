@@ -8,8 +8,9 @@ import (
 type Real float32
 
 const (
+	MinReal Real = math.SmallestNonzeroFloat32
 	MaxReal Real = math.MaxFloat32
-	Pi           = math.Pi
+	Pi      Real = math.Pi
 )
 
 func Random() Real {
