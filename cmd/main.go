@@ -9,20 +9,17 @@ import (
 	"github.com/patricktcoakley/go-rtiow/internal/scene"
 	"github.com/patricktcoakley/go-rtiow/internal/shapes"
 	"github.com/patricktcoakley/go-rtiow/internal/tracer"
-	"runtime"
 	"sync"
 )
 
 var samplesPerPixel int
 var imageWidth int
 var aspectRatio float64
-var jobs int
 
 func init() {
 	flag.IntVar(&samplesPerPixel, "samples", 1000, "Number of samples per pixel")
 	flag.IntVar(&imageWidth, "width", 1200, "Width of render")
 	flag.Float64Var(&aspectRatio, "aspect-ratio", 3.0/2.0, "The aspect ratio of render")
-	flag.IntVar(&jobs, "jobs", runtime.GOMAXPROCS(0), "The number of jobs")
 }
 
 func randomScene() hittable.HitList {
@@ -84,44 +81,36 @@ func main() {
 		10,
 	)
 	viewer := scene.NewCanvas(imageWidth, imageHeight, samplesPerPixel)
+	pixels := make(chan pixel, imageWidth*imageHeight)
 
-	coords := make(chan coord)
-	pixels := make(chan pixel)
+	var wg sync.WaitGroup
+	wg.Add(imageWidth)
 
 	go func() {
-		for y := 0; y < imageHeight; y++ {
-			for x := 0; x < imageWidth; x++ {
-				coords <- coord{x, y}
-			}
+		for p := range pixels {
+			viewer.WritePixel(p.x, p.y, p.color)
 		}
-		close(coords)
 	}()
 
-	go func() {
-		var wg sync.WaitGroup
-		wg.Add(jobs)
-		for job := 1; job <= jobs; job++ {
-			go func() {
-				defer wg.Done()
-				for c := range coords {
-					var pixelColor geometry.Vec3
-					for s := 0; s < samplesPerPixel; s++ {
-						u := (math.Real(c.x) + math.Random()) / math.Real(imageWidth-1)
-						v := (math.Real(c.y) + math.Random()) / math.Real(imageHeight-1)
-						r := cam.GetRay(u, v)
-						pixelColor = geometry.Add(pixelColor, tracer.RayColor(r, world))
-					}
-					pixels <- pixel{coord{c.x, c.y}, pixelColor}
+	for x := 0; x < imageWidth; x++ {
+		go func(x int) {
+			for y := 0; y < imageHeight; y++ {
+				var pixelColor geometry.Vec3
+				for s := 0; s < samplesPerPixel; s++ {
+					u := (math.Real(x) + math.Random()) / math.Real(imageWidth-1)
+					v := (math.Real(y) + math.Random()) / math.Real(imageHeight-1)
+					r := cam.GetRay(u, v)
+					pixelColor = geometry.Add(pixelColor, tracer.RayColor(r, world))
 				}
-			}()
-		}
-		wg.Wait()
-		close(pixels)
-	}()
 
-	for p := range pixels {
-		viewer.WritePixel(p.x, p.y, p.color)
+				pixels <- pixel{coord{x, y}, pixelColor}
+			}
+			wg.Done()
+		}(x)
 	}
+
+	wg.Wait()
+	close(pixels)
 
 	viewer.WriteImage()
 }
