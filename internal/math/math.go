@@ -14,7 +14,7 @@ const (
 )
 
 func Random() Real {
-	return Real(rand.Float64())
+	return Real(rand.Float32())
 }
 
 func Sqrt(t Real) Real {
@@ -22,11 +22,7 @@ func Sqrt(t Real) Real {
 }
 
 func Min(a, b Real) Real {
-	return Real(math.Min(float64(a), float64(b)))
-}
-
-func Max(a, b Real) Real {
-	return Real(math.Max(float64(a), float64(b)))
+	return min(a, b)
 }
 
 func Abs(t Real) Real {

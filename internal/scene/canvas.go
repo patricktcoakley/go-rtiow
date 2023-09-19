@@ -1,4 +1,4 @@
-package canvas
+package scene
 
 import (
 	"image"
@@ -6,8 +6,8 @@ import (
 	"image/png"
 	"os"
 
+	"github.com/patricktcoakley/go-rtiow/internal/geometry"
 	"github.com/patricktcoakley/go-rtiow/internal/math"
-	"github.com/patricktcoakley/go-rtiow/internal/vec3"
 )
 
 type Canvas struct {
@@ -30,7 +30,7 @@ func (c Canvas) pixelOffset(x, y int) int {
 	return 4 * (y*c.width + x)
 }
 
-func (c Canvas) WritePixel(x, y int, color vec3.Vec3) {
+func (c Canvas) WritePixel(x, y int, color geometry.Vec3) {
 	scale := 1 / c.samplesPerPixel
 	pixelColor := newColorFromVec3(color, scale)
 	offset := c.pixelOffset(x, y)
@@ -51,7 +51,7 @@ func (c Canvas) WriteImage() {
 	}
 }
 
-func newColorFromVec3(v vec3.Vec3, scale math.Real) color.RGBA {
+func newColorFromVec3(v geometry.Vec3, scale math.Real) color.RGBA {
 	return color.RGBA{
 		R: uint8(clamp(math.Sqrt(v.X*scale)) * 256),
 		G: uint8(clamp(math.Sqrt(v.Y*scale)) * 256),
@@ -64,6 +64,7 @@ func clamp(x math.Real) math.Real {
 	if x < 0.0 {
 		return 0.0
 	}
+
 	if x > 0.999 {
 		return 0.999
 	}

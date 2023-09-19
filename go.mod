@@ -1,3 +1,3 @@
 module github.com/patricktcoakley/go-rtiow
 
-go 1.20
+go 1.21

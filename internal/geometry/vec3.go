@@ -1,4 +1,4 @@
-package vec3
+package geometry
 
 import (
 	"github.com/patricktcoakley/go-rtiow/internal/math"
