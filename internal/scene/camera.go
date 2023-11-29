@@ -23,7 +23,7 @@ func NewCamera(
 	aspectRatio,
 	verticalFov,
 	aperture,
-	focusDistance math.Real) *Camera {
+	focusDistance math.Real) Camera {
 
 	theta := degreesToRadians(verticalFov)
 	h := math.Tan(theta / 2.0)
@@ -39,7 +39,7 @@ func NewCamera(
 	vertical := v.MulScalar(viewportHeight).MulScalar(focusDistance)
 	lowerLeftCorner := origin.Sub(horizontal.DivScalar(2)).Sub(vertical.DivScalar(2)).Sub(w.MulScalar(focusDistance))
 	lensRadius := aperture / 2
-	return &Camera{
+	return Camera{
 		origin,
 		lowerLeftCorner,
 		horizontal,
@@ -51,7 +51,7 @@ func NewCamera(
 	}
 }
 
-func (c *Camera) GetRay(s, t math.Real) geometry.Ray {
+func (c Camera) GetRay(s, t math.Real) geometry.Ray {
 	rd := geometry.RandomInUnitDisk().MulScalar(c.lensRadius)
 	offset := c.u.MulScalar(rd.X).Add(c.v.MulScalar(rd.Y))
 	return geometry.Ray{

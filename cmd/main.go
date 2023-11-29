@@ -14,12 +14,28 @@ import (
 
 var samplesPerPixel int
 var imageWidth int
+var imageHeight int
 var aspectRatio float64
+var camera scene.Camera
+var canvas scene.Canvas
+var world hittable.HitList
 
 func init() {
 	flag.IntVar(&samplesPerPixel, "samples", 1000, "Number of samples per pixel")
 	flag.IntVar(&imageWidth, "width", 1200, "Width of render")
 	flag.Float64Var(&aspectRatio, "aspect-ratio", 3.0/2.0, "The aspect ratio of render")
+}
+
+func samplePixel(x int, y int) pixel {
+	var pixelColor geometry.Vec3
+	for s := 0; s < samplesPerPixel; s++ {
+		u := (math.Real(x) + math.Random()) / math.Real(imageWidth-1)
+		v := (math.Real(y) + math.Random()) / math.Real(imageHeight-1)
+		r := camera.GetRay(u, v)
+		pixelColor = geometry.Add(pixelColor, tracer.RayColor(r, world))
+	}
+
+	return pixel{x, y, pixelColor}
 }
 
 func randomScene() hittable.HitList {
@@ -47,6 +63,7 @@ func randomScene() hittable.HitList {
 			}
 		}
 	}
+
 	dielectric := material.NewDielectric(1.5)
 	lambertian := material.NewLambertian(0.4, 0.2, 0.1)
 	metal := material.NewMetal(0.7, 0.6, 0.5, 0)
@@ -57,21 +74,18 @@ func randomScene() hittable.HitList {
 	return world
 }
 
-type coord struct{ x, y int }
-
 type pixel struct {
-	coord
+	x, y  int
 	color geometry.Vec3
 }
 
 func main() {
 	flag.Parse()
 	aspectRatio := math.Real(aspectRatio)
-	imageHeight := int(math.Real(imageWidth) / aspectRatio)
-	world := randomScene()
+	imageHeight = int(math.Real(imageWidth) / aspectRatio)
 	lookFrom := geometry.Vec3{X: 13, Y: 2, Z: 3}
 	lookAt := geometry.Vec3{}
-	cam := scene.NewCamera(
+	camera = scene.NewCamera(
 		lookFrom,
 		lookAt,
 		geometry.Vec3{Y: 1},
@@ -80,37 +94,30 @@ func main() {
 		0.1,
 		10,
 	)
-	viewer := scene.NewCanvas(imageWidth, imageHeight, samplesPerPixel)
+	world = randomScene()
+	canvas = scene.NewCanvas(imageWidth, imageHeight, samplesPerPixel)
 	pixels := make(chan pixel, imageWidth*imageHeight)
 
 	var wg sync.WaitGroup
-	wg.Add(imageWidth)
+	wg.Add(imageWidth * imageHeight)
 
 	go func() {
 		for p := range pixels {
-			viewer.WritePixel(p.x, p.y, p.color)
+			canvas.WritePixel(p.x, p.y, p.color)
+			wg.Done()
 		}
 	}()
 
 	for x := 0; x < imageWidth; x++ {
 		go func(x int) {
 			for y := 0; y < imageHeight; y++ {
-				var pixelColor geometry.Vec3
-				for s := 0; s < samplesPerPixel; s++ {
-					u := (math.Real(x) + math.Random()) / math.Real(imageWidth-1)
-					v := (math.Real(y) + math.Random()) / math.Real(imageHeight-1)
-					r := cam.GetRay(u, v)
-					pixelColor = geometry.Add(pixelColor, tracer.RayColor(r, world))
-				}
-
-				pixels <- pixel{coord{x, y}, pixelColor}
+				pixels <- samplePixel(x, y)
 			}
-			wg.Done()
 		}(x)
 	}
 
 	wg.Wait()
 	close(pixels)
 
-	viewer.WriteImage()
+	canvas.WriteImage()
 }

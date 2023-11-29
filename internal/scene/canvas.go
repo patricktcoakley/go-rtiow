@@ -16,8 +16,8 @@ type Canvas struct {
 	img             *image.RGBA
 }
 
-func NewCanvas(width, height, samplesPerPixel int) *Canvas {
-	return &Canvas{
+func NewCanvas(width, height, samplesPerPixel int) Canvas {
+	return Canvas{
 		width,
 		height,
 		math.Real(samplesPerPixel),
