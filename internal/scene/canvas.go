@@ -53,21 +53,9 @@ func (c Canvas) WriteImage() {
 
 func newColorFromVec3(v geometry.Vec3, scale math.Real) color.RGBA {
 	return color.RGBA{
-		R: uint8(clamp(math.Sqrt(v.X*scale)) * 256),
-		G: uint8(clamp(math.Sqrt(v.Y*scale)) * 256),
-		B: uint8(clamp(math.Sqrt(v.Z*scale)) * 256),
+		R: uint8(math.Clamp(0.0, 0.999, math.Sqrt(v.X*scale)) * 256),
+		G: uint8(math.Clamp(0.0, 0.999, math.Sqrt(v.Y*scale)) * 256),
+		B: uint8(math.Clamp(0.0, 0.999, math.Sqrt(v.Z*scale)) * 256),
 		A: 255,
 	}
-}
-
-func clamp(x math.Real) math.Real {
-	if x < 0.0 {
-		return 0.0
-	}
-
-	if x > 0.999 {
-		return 0.999
-	}
-
-	return x
 }

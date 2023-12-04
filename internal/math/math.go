@@ -36,3 +36,15 @@ func Pow(x, y Real) Real {
 func Tan(x Real) Real {
 	return Real(math.Tan(float64(x)))
 }
+
+func Clamp(min, max, x Real) Real {
+	if x < min {
+		return min
+	}
+
+	if x > max {
+		return max
+	}
+
+	return x
+}

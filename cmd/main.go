@@ -85,14 +85,18 @@ func main() {
 	imageHeight = int(math.Real(imageWidth) / aspectRatio)
 	lookFrom := geometry.Vec3{X: 13, Y: 2, Z: 3}
 	lookAt := geometry.Vec3{}
+	verticalUp := geometry.Vec3{Y: 1}
+	verticalFov := math.Real(20)
+	aperture := math.Real(0.1)
+	focusDistance := math.Real(10.0)
 	camera = scene.NewCamera(
 		lookFrom,
 		lookAt,
-		geometry.Vec3{Y: 1},
+		verticalUp,
 		aspectRatio,
-		20,
-		0.1,
-		10,
+		verticalFov,
+		aperture,
+		focusDistance,
 	)
 	world = randomScene()
 	canvas = scene.NewCanvas(imageWidth, imageHeight, samplesPerPixel)
