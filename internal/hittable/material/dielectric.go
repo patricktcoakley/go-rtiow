@@ -17,14 +17,16 @@ func NewDielectric(ir math.Real) *Dielectric {
 func (d *Dielectric) Scatter(rIn geometry.Ray, hr *hittable.HitRecord, attenuation *geometry.Vec3, scattered *geometry.Ray) bool {
 	*attenuation = geometry.Vec3{X: 1, Y: 1, Z: 1}
 	refractionRatio := d.Ir
+
 	if hr.FrontFace {
 		refractionRatio = 1 / d.Ir
 	}
 
 	unitDirection := rIn.Direction.ToUnit()
-	cosTheta := math.Min(geometry.Dot(unitDirection.Neg(), hr.Normal), 1.)
+	cosTheta := min(geometry.Dot(unitDirection.Neg(), hr.Normal), 1.)
 	sinTheta := math.Sqrt(1 - cosTheta*cosTheta)
 	cannotRefract := refractionRatio*sinTheta > 1.
+
 	var direction geometry.Vec3
 	if cannotRefract || reflectance(cosTheta, refractionRatio) > math.Random() {
 		direction = geometry.Reflect(unitDirection, hr.Normal)
@@ -33,6 +35,7 @@ func (d *Dielectric) Scatter(rIn geometry.Ray, hr *hittable.HitRecord, attenuati
 	}
 
 	*scattered = geometry.Ray{Origin: hr.Point, Direction: direction}
+
 	return true
 }
 

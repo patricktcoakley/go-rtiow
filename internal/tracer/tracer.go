@@ -35,8 +35,10 @@ func rayColor(r geometry.Ray, obj hittable.Hittable, hr *hittable.HitRecord, dep
 func handleHit(r geometry.Ray, obj hittable.Hittable, hr *hittable.HitRecord, depth int) geometry.Vec3 {
 	var scattered geometry.Ray
 	var attenuation geometry.Vec3
+
 	if hr.Material.Scatter(r, hr, &attenuation, &scattered) {
 		return geometry.Mul(attenuation, rayColor(scattered, obj, hr, depth-1))
 	}
+
 	return geometry.Vec3{}
 }

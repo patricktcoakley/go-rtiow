@@ -21,10 +21,6 @@ func Sqrt(t Real) Real {
 	return Real(math.Sqrt(float64(t)))
 }
 
-func Min(a, b Real) Real {
-	return min(a, b)
-}
-
 func Abs(t Real) Real {
 	return Real(math.Abs(float64(t)))
 }
