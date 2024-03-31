@@ -1,57 +1,30 @@
 package scene
 
 import (
-	"image"
-	"image/color"
-	"image/png"
-	"os"
-
 	"github.com/patricktcoakley/go-rtiow/internal/geometry"
 	"github.com/patricktcoakley/go-rtiow/internal/math"
+	"image/color"
 )
 
-type Canvas struct {
-	width, height   int
-	samplesPerPixel math.Real
-	img             *image.RGBA
+type Canvas interface {
+	WritePixel(x, y int, color geometry.Vec3)
+	Run()
 }
 
-func NewCanvas(width, height, samplesPerPixel int) Canvas {
-	return Canvas{
-		width,
-		height,
-		math.Real(samplesPerPixel),
-		image.NewRGBA(image.Rect(0, 0, width, height)),
+type CanvasOpts struct {
+	Width, Height, SamplesPerPixel int
+	UsePpm                         bool
+}
+
+func NewCanvas(opts CanvasOpts) Canvas {
+	if opts.UsePpm {
+		return newPpmCanvas(opts.Width, opts.Height, opts.SamplesPerPixel)
 	}
+
+	return newEbitenCanvas(opts.Width, opts.Height, opts.SamplesPerPixel)
 }
 
-func (c Canvas) pixelOffset(x, y int) int {
-	y = c.height - y - 1
-	return 4 * (y*c.width + x)
-}
-
-func (c Canvas) WritePixel(x, y int, color geometry.Vec3) {
-	scale := 1 / c.samplesPerPixel
-	pixelColor := newColorFromVec3(color, scale)
-	offset := c.pixelOffset(x, y)
-	c.img.Pix[offset] = pixelColor.R
-	c.img.Pix[offset+1] = pixelColor.G
-	c.img.Pix[offset+2] = pixelColor.B
-	c.img.Pix[offset+3] = pixelColor.A
-}
-
-func (c Canvas) WriteImage() {
-	f, err := os.Create("out.png")
-	if err != nil {
-		panic(err)
-	}
-	err = png.Encode(f, c.img)
-	if err != nil {
-		panic(err)
-	}
-}
-
-func newColorFromVec3(v geometry.Vec3, scale math.Real) color.RGBA {
+func newRGBAFromVec3(v geometry.Vec3, scale math.Real) color.RGBA {
 	return color.RGBA{
 		R: uint8(math.Clamp(0.0, 0.999, math.Sqrt(v.X*scale)) * 256),
 		G: uint8(math.Clamp(0.0, 0.999, math.Sqrt(v.Y*scale)) * 256),

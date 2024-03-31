@@ -21,7 +21,7 @@ var canvas scene.Canvas
 var world hittable.HitList
 
 func init() {
-	flag.IntVar(&samplesPerPixel, "samples", 1000, "Number of samples per pixel")
+	flag.IntVar(&samplesPerPixel, "samples", 1, "Number of samples per pixel")
 	flag.IntVar(&imageWidth, "width", 1200, "Width of render")
 	flag.Float64Var(&aspectRatio, "aspect-ratio", 3.0/2.0, "The aspect ratio of render")
 }
@@ -99,7 +99,14 @@ func main() {
 		focusDistance,
 	)
 	world = randomScene()
-	canvas = scene.NewCanvas(imageWidth, imageHeight, samplesPerPixel)
+
+	canvasOpts := scene.CanvasOpts{
+		Width:           imageWidth,
+		Height:          imageHeight,
+		SamplesPerPixel: samplesPerPixel,
+		UsePpm:          false,
+	}
+	canvas = scene.NewCanvas(canvasOpts)
 	pixels := make(chan pixel, imageWidth*imageHeight)
 
 	var wg sync.WaitGroup
@@ -123,5 +130,5 @@ func main() {
 	wg.Wait()
 	close(pixels)
 
-	canvas.WriteImage()
+	canvas.Run()
 }
