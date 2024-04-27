@@ -9,6 +9,8 @@ import (
 	"github.com/patricktcoakley/go-rtiow/internal/scene"
 	"github.com/patricktcoakley/go-rtiow/internal/shapes"
 	"github.com/patricktcoakley/go-rtiow/internal/tracer"
+	"os"
+	"runtime/pprof"
 	"sync"
 )
 
@@ -18,13 +20,9 @@ var imageHeight int
 var aspectRatio float64
 var camera scene.Camera
 var canvas scene.Canvas
+var canvasType string
 var world hittable.HitList
-
-func init() {
-	flag.IntVar(&samplesPerPixel, "samples", 1, "Number of samples per pixel")
-	flag.IntVar(&imageWidth, "width", 1200, "Width of render")
-	flag.Float64Var(&aspectRatio, "aspect-ratio", 3.0/2.0, "The aspect ratio of render")
-}
+var pgoProfile bool
 
 func samplePixel(x int, y int) pixel {
 	var pixelColor geometry.Vec3
@@ -80,7 +78,27 @@ type pixel struct {
 }
 
 func main() {
+	if pgoProfile {
+		f, err := os.Open("default.pgo")
+		if err != nil {
+			panic(err)
+		}
+
+		if err = pprof.StartCPUProfile(f); err != nil {
+			panic(err)
+		}
+
+		defer pprof.StopCPUProfile()
+	}
+
+	flag.IntVar(&samplesPerPixel, "samples", 100, "Number of samples per pixel")
+	flag.IntVar(&imageWidth, "width", 1200, "Width of render")
+	flag.Float64Var(&aspectRatio, "aspect-ratio", 3.0/2.0, "The aspect ratio of render")
+	flag.StringVar(&canvasType, "canvas", "ebiten", "Canvas for the scene: 'ebiten' or 'ppm'")
+	flag.BoolVar(&pgoProfile, "pgo-profile", false, "Enable to PGO profile")
+
 	flag.Parse()
+
 	aspectRatio := math.Real(aspectRatio)
 	imageHeight = int(math.Real(imageWidth) / aspectRatio)
 	lookFrom := geometry.Vec3{X: 13, Y: 2, Z: 3}
@@ -104,8 +122,9 @@ func main() {
 		Width:           imageWidth,
 		Height:          imageHeight,
 		SamplesPerPixel: samplesPerPixel,
-		UsePpm:          false,
+		CanvasType:      canvasType,
 	}
+
 	canvas = scene.NewCanvas(canvasOpts)
 	pixels := make(chan pixel, imageWidth*imageHeight)
 

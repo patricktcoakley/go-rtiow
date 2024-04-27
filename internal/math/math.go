@@ -2,7 +2,7 @@ package math
 
 import (
 	"math"
-	"math/rand"
+	"math/rand/v2"
 )
 
 type Real float32

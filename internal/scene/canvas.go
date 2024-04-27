@@ -1,6 +1,7 @@
 package scene
 
 import (
+	"fmt"
 	"github.com/patricktcoakley/go-rtiow/internal/geometry"
 	"github.com/patricktcoakley/go-rtiow/internal/math"
 	"image/color"
@@ -13,15 +14,18 @@ type Canvas interface {
 
 type CanvasOpts struct {
 	Width, Height, SamplesPerPixel int
-	UsePpm                         bool
+	CanvasType                     string
 }
 
 func NewCanvas(opts CanvasOpts) Canvas {
-	if opts.UsePpm {
+	switch opts.CanvasType {
+	case "ppm":
 		return newPpmCanvas(opts.Width, opts.Height, opts.SamplesPerPixel)
+	case "ebiten":
+		return newEbitenCanvas(opts.Width, opts.Height, opts.SamplesPerPixel)
+	default:
+		panic(fmt.Sprintf("invalid canvas type: got %s, expected 'ebiten' | 'ppm'", opts.CanvasType))
 	}
-
-	return newEbitenCanvas(opts.Width, opts.Height, opts.SamplesPerPixel)
 }
 
 func newRGBAFromVec3(v geometry.Vec3, scale math.Real) color.RGBA {
