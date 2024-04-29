@@ -9,14 +9,14 @@ import (
 	"github.com/patricktcoakley/go-rtiow/internal/math"
 )
 
-type PpmCanvas struct {
+type PngCanvas struct {
 	width, height   int
 	samplesPerPixel math.Real
 	img             *image.RGBA
 }
 
-func newPpmCanvas(width, height, samplesPerPixel int) Canvas {
-	return &PpmCanvas{
+func newPngCanvas(width, height, samplesPerPixel int) Canvas {
+	return &PngCanvas{
 		width,
 		height,
 		math.Real(samplesPerPixel),
@@ -24,12 +24,12 @@ func newPpmCanvas(width, height, samplesPerPixel int) Canvas {
 	}
 }
 
-func (c *PpmCanvas) pixelOffset(x, y int) int {
+func (c *PngCanvas) pixelOffset(x, y int) int {
 	y = c.height - y - 1
 	return 4 * (y*c.width + x)
 }
 
-func (c *PpmCanvas) WritePixel(x, y int, color geometry.Vec3) {
+func (c *PngCanvas) WritePixel(x, y int, color geometry.Vec3) {
 	scale := 1 / c.samplesPerPixel
 	pixelColor := newRGBAFromVec3(color, scale)
 	offset := c.pixelOffset(x, y)
@@ -39,7 +39,7 @@ func (c *PpmCanvas) WritePixel(x, y int, color geometry.Vec3) {
 	c.img.Pix[offset+3] = pixelColor.A
 }
 
-func (c *PpmCanvas) Run() {
+func (c *PngCanvas) Run() {
 	f, err := os.Create("out.png")
 	if err != nil {
 		panic(err)

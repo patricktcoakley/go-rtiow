@@ -19,20 +19,28 @@ type CanvasOpts struct {
 
 func NewCanvas(opts CanvasOpts) Canvas {
 	switch opts.CanvasType {
-	case "ppm":
-		return newPpmCanvas(opts.Width, opts.Height, opts.SamplesPerPixel)
+	case "png":
+		return newPngCanvas(opts.Width, opts.Height, opts.SamplesPerPixel)
 	case "ebiten":
 		return newEbitenCanvas(opts.Width, opts.Height, opts.SamplesPerPixel)
 	default:
-		panic(fmt.Sprintf("invalid canvas type: got %s, expected 'ebiten' | 'ppm'", opts.CanvasType))
+		panic(fmt.Sprintf("invalid canvas type: got %s, expected ['ebiten' | 'png']", opts.CanvasType))
 	}
 }
 
 func newRGBAFromVec3(v geometry.Vec3, scale math.Real) color.RGBA {
+	rr := math.Sqrt(v.X * scale)
+	gg := math.Sqrt(v.Y * scale)
+	bb := math.Sqrt(v.Z * scale)
+
+	r := math.Clamp(0, 255, uint8(rr*255))
+	g := math.Clamp(0, 255, uint8(gg*255))
+	b := math.Clamp(0, 255, uint8(bb*255))
+
 	return color.RGBA{
-		R: uint8(math.Clamp(0.0, 0.999, math.Sqrt(v.X*scale)) * 256),
-		G: uint8(math.Clamp(0.0, 0.999, math.Sqrt(v.Y*scale)) * 256),
-		B: uint8(math.Clamp(0.0, 0.999, math.Sqrt(v.Z*scale)) * 256),
+		R: r,
+		G: g,
+		B: b,
 		A: 255,
 	}
 }

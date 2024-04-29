@@ -26,11 +26,13 @@ var pgoProfile bool
 
 func samplePixel(x int, y int) pixel {
 	var pixelColor geometry.Vec3
+	hr := new(hittable.HitRecord)
+
 	for s := 0; s < samplesPerPixel; s++ {
 		u := (math.Real(x) + math.Random()) / math.Real(imageWidth-1)
 		v := (math.Real(y) + math.Random()) / math.Real(imageHeight-1)
 		r := camera.GetRay(u, v)
-		pixelColor = geometry.Add(pixelColor, tracer.RayColor(r, world))
+		pixelColor = geometry.Add(pixelColor, tracer.RayColor(r, world, hr))
 	}
 
 	return pixel{x, y, pixelColor}
@@ -78,8 +80,16 @@ type pixel struct {
 }
 
 func main() {
+	flag.IntVar(&samplesPerPixel, "samples", 100, "Number of samples per pixel")
+	flag.IntVar(&imageWidth, "width", 1200, "Width of render")
+	flag.Float64Var(&aspectRatio, "aspect-ratio", 3.0/2.0, "The aspect ratio of render")
+	flag.StringVar(&canvasType, "canvas", "png", "Canvas for the scene: 'ebiten' or 'png'")
+	flag.BoolVar(&pgoProfile, "pgo-profile", false, "Enable to PGO profile")
+
+	flag.Parse()
+
 	if pgoProfile {
-		f, err := os.Open("default.pgo")
+		f, err := os.Create("default.pgo")
 		if err != nil {
 			panic(err)
 		}
@@ -90,14 +100,6 @@ func main() {
 
 		defer pprof.StopCPUProfile()
 	}
-
-	flag.IntVar(&samplesPerPixel, "samples", 100, "Number of samples per pixel")
-	flag.IntVar(&imageWidth, "width", 1200, "Width of render")
-	flag.Float64Var(&aspectRatio, "aspect-ratio", 3.0/2.0, "The aspect ratio of render")
-	flag.StringVar(&canvasType, "canvas", "ebiten", "Canvas for the scene: 'ebiten' or 'ppm'")
-	flag.BoolVar(&pgoProfile, "pgo-profile", false, "Enable to PGO profile")
-
-	flag.Parse()
 
 	aspectRatio := math.Real(aspectRatio)
 	imageHeight = int(math.Real(imageWidth) / aspectRatio)
