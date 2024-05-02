@@ -3,7 +3,6 @@ package scene
 import (
 	"errors"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/patricktcoakley/go-rtiow/internal/geometry"
 	"github.com/patricktcoakley/go-rtiow/internal/math"
 	"log"
 	"os"
@@ -40,10 +39,10 @@ func (c *EbitenCanvas) pixelOffset(x, y int) int {
 	return 4 * (y*c.width + x)
 }
 
-func (c *EbitenCanvas) WritePixel(x, y int, color geometry.Vec3) {
+func (c *EbitenCanvas) WritePixel(pixel Pixel) {
 	scale := 1 / c.samplesPerPixel
-	pixelColor := newRGBAFromVec3(color, scale)
-	offset := c.pixelOffset(x, y)
+	pixelColor := newRGBAFromVec3(pixel.Color, scale)
+	offset := c.pixelOffset(pixel.X, pixel.Y)
 	c.buffer[offset] = pixelColor.R
 	c.buffer[offset+1] = pixelColor.G
 	c.buffer[offset+2] = pixelColor.B

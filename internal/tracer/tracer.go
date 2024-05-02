@@ -15,25 +15,22 @@ var (
 
 func RayColor(r geometry.Ray, obj hittable.Hittable, hr *hittable.HitRecord) geometry.Vec3 {
 	var scattered geometry.Ray
-	var depth int
 
 	color := white
 	attenuation := white
 	currentRay := r
 
-	for depth < maxDepth {
-		hitSomething := obj.Hit(currentRay, 0.001, math.MaxReal, hr)
+	for range maxDepth {
+		didHitOrScatter := obj.Hit(currentRay, 0.001, math.MaxReal, hr) && hr.Material.Scatter(currentRay, hr, &attenuation, &scattered)
 
-		if !hitSomething || !(hr.Material.Scatter(currentRay, hr, &attenuation, &scattered)) {
+		if !(didHitOrScatter) {
 			unitDirection := currentRay.Direction.ToUnit()
 			a := 0.5 * (unitDirection.Y + 1.0)
-			return color.Mul(
-				white.MulScalar(1.0 - a).Add(blue.MulScalar(a)))
+			return color.Mul(white.MulScalar(1.0 - a).Add(blue.MulScalar(a)))
 		}
 
 		color = color.Mul(attenuation)
 		currentRay = scattered
-		depth++
 	}
 
 	return geometry.Vec3{}

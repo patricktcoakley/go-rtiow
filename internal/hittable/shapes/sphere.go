@@ -23,21 +23,26 @@ func (s *Sphere) Hit(r geometry.Ray, tMin, tMax math.Real, hr *hittable.HitRecor
 	halfB := geometry.Dot(r.Direction, originCenter)
 	c := originCenter.LengthSquared() - s.Radius*s.Radius
 	discriminant := halfB*halfB - a*c
+
 	if discriminant < 0 {
 		return false
 	}
+
 	sqrtD := math.Sqrt(discriminant)
 	root := (-halfB - sqrtD) / a
+
 	if root < tMin || root > tMax {
 		root = (-halfB - sqrtD) / a
 		if root < tMin || root > tMax {
 			return false
 		}
 	}
+
 	hr.T = root
 	hr.Point = r.At(hr.T)
 	outwardNormal := (hr.Point.Sub(s.Center)).DivScalar(s.Radius)
 	hr.SetFaceNormal(r, outwardNormal)
 	hr.Material = s.Material
+
 	return true
 }

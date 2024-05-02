@@ -8,7 +8,7 @@ import (
 )
 
 type Canvas interface {
-	WritePixel(x, y int, color geometry.Vec3)
+	WritePixel(pixel Pixel)
 	Run()
 }
 

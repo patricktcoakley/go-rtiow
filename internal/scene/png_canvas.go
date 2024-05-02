@@ -5,7 +5,6 @@ import (
 	"image/png"
 	"os"
 
-	"github.com/patricktcoakley/go-rtiow/internal/geometry"
 	"github.com/patricktcoakley/go-rtiow/internal/math"
 )
 
@@ -29,10 +28,10 @@ func (c *PngCanvas) pixelOffset(x, y int) int {
 	return 4 * (y*c.width + x)
 }
 
-func (c *PngCanvas) WritePixel(x, y int, color geometry.Vec3) {
+func (c *PngCanvas) WritePixel(pixel Pixel) {
 	scale := 1 / c.samplesPerPixel
-	pixelColor := newRGBAFromVec3(color, scale)
-	offset := c.pixelOffset(x, y)
+	pixelColor := newRGBAFromVec3(pixel.Color, scale)
+	offset := c.pixelOffset(pixel.X, pixel.Y)
 	c.img.Pix[offset] = pixelColor.R
 	c.img.Pix[offset+1] = pixelColor.G
 	c.img.Pix[offset+2] = pixelColor.B

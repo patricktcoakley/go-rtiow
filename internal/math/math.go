@@ -33,7 +33,7 @@ func Tan(x Real) Real {
 	return Real(math.Tan(float64(x)))
 }
 
-func Clamp[T number](min, max, x T) T {
+func Clamp(min, max, x uint8) uint8 {
 	if x < min {
 		return min
 	}
@@ -43,8 +43,4 @@ func Clamp[T number](min, max, x T) T {
 	}
 
 	return x
-}
-
-type number interface {
-	Real | ~uint8
 }

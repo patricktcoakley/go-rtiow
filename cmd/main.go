@@ -5,50 +5,56 @@ import (
 	"github.com/patricktcoakley/go-rtiow/internal/geometry"
 	"github.com/patricktcoakley/go-rtiow/internal/hittable"
 	"github.com/patricktcoakley/go-rtiow/internal/hittable/material"
+	"github.com/patricktcoakley/go-rtiow/internal/hittable/shapes"
 	"github.com/patricktcoakley/go-rtiow/internal/math"
 	"github.com/patricktcoakley/go-rtiow/internal/scene"
-	"github.com/patricktcoakley/go-rtiow/internal/shapes"
 	"github.com/patricktcoakley/go-rtiow/internal/tracer"
 	"os"
 	"runtime/pprof"
 	"sync"
 )
 
-var samplesPerPixel int
-var imageWidth int
-var imageHeight int
-var aspectRatio float64
-var camera scene.Camera
-var canvas scene.Canvas
-var canvasType string
-var world hittable.HitList
-var pgoProfile bool
+var (
+	samplesPerPixel int
+	imageWidth      int
+	imageHeight     int
+	aspectRatio     float64
+	camera          *scene.Camera
+	canvas          scene.Canvas
+	canvasType      string
+	world           hittable.HitList
+	pgoProfile      bool
+)
 
-func samplePixel(x int, y int) pixel {
-	var pixelColor geometry.Vec3
+func samplePixel(input scene.Pixel) scene.Pixel {
 	hr := new(hittable.HitRecord)
 
 	for s := 0; s < samplesPerPixel; s++ {
-		u := (math.Real(x) + math.Random()) / math.Real(imageWidth-1)
-		v := (math.Real(y) + math.Random()) / math.Real(imageHeight-1)
+		u := (math.Real(input.X) + math.Random()) / math.Real(imageWidth-1)
+		v := (math.Real(input.Y) + math.Random()) / math.Real(imageHeight-1)
 		r := camera.GetRay(u, v)
-		pixelColor = geometry.Add(pixelColor, tracer.RayColor(r, world, hr))
+		input.Color = geometry.Add(input.Color, tracer.RayColor(r, world, hr))
 	}
 
-	return pixel{x, y, pixelColor}
+	return input
 }
 
 func randomScene() hittable.HitList {
-	world := hittable.HitList{}
+	var mat hittable.Scatterable
+
+	hl := make(hittable.HitList, 0, 500)
 	ground := material.NewLambertian(0.5, 0.5, 0.5)
-	world = append(world, shapes.NewSphere(0, -1000, 0, 1000, ground))
+	hl = append(hl, shapes.NewSphere(0, -1000, 0, 1000, ground))
+
+	dielectric := material.NewDielectric(1.5)
+	lambertian := material.NewLambertian(0.4, 0.2, 0.1)
+	metal := material.NewMetal(0.7, 0.6, 0.5, 0)
 
 	for a := -11; a < 11; a++ {
 		for b := -11; b < 11; b++ {
 			chooseMat := math.Random()
 			center := geometry.Vec3{X: math.Real(a) + 0.9*math.Random(), Y: 0.2, Z: math.Real(b) + 0.9*math.Random()}
 			if (center.Sub(geometry.Vec3{X: 4, Y: 0.2, Z: 0}).Length() > 0.9) {
-				var mat hittable.Scatterable
 				if chooseMat < 0.8 {
 					albedo := geometry.NewRandomVec3().Mul(geometry.NewRandomVec3())
 					mat = material.NewLambertian(albedo.X, albedo.Y, albedo.Z)
@@ -59,28 +65,20 @@ func randomScene() hittable.HitList {
 				} else {
 					mat = material.NewDielectric(1.5)
 				}
-				world = append(world, shapes.NewSphere(center.X, center.Y, center.Z, 0.2, mat))
+
+				hl = append(hl, shapes.NewSphere(center.X, center.Y, center.Z, 0.2, mat))
 			}
 		}
 	}
+	hl = append(hl, shapes.NewSphere(0, 1, 0, 1, dielectric))
+	hl = append(hl, shapes.NewSphere(-4, 1, 0, 1, lambertian))
+	hl = append(hl, shapes.NewSphere(4, 1, 0, 1, metal))
 
-	dielectric := material.NewDielectric(1.5)
-	lambertian := material.NewLambertian(0.4, 0.2, 0.1)
-	metal := material.NewMetal(0.7, 0.6, 0.5, 0)
-	world = append(world, shapes.NewSphere(0, 1, 0, 1, dielectric))
-	world = append(world, shapes.NewSphere(-4, 1, 0, 1, lambertian))
-	world = append(world, shapes.NewSphere(4, 1, 0, 1, metal))
-
-	return world
-}
-
-type pixel struct {
-	x, y  int
-	color geometry.Vec3
+	return hl
 }
 
 func main() {
-	flag.IntVar(&samplesPerPixel, "samples", 100, "Number of samples per pixel")
+	flag.IntVar(&samplesPerPixel, "samples", 100, "Number of samples per Pixel")
 	flag.IntVar(&imageWidth, "width", 1200, "Width of render")
 	flag.Float64Var(&aspectRatio, "aspect-ratio", 3.0/2.0, "The aspect ratio of render")
 	flag.StringVar(&canvasType, "canvas", "png", "Canvas for the scene: 'ebiten' or 'png'")
@@ -118,6 +116,7 @@ func main() {
 		aperture,
 		focusDistance,
 	)
+
 	world = randomScene()
 
 	canvasOpts := scene.CanvasOpts{
@@ -128,28 +127,28 @@ func main() {
 	}
 
 	canvas = scene.NewCanvas(canvasOpts)
-	pixels := make(chan pixel, imageWidth*imageHeight)
+	pixels := make(chan scene.Pixel, imageWidth*imageHeight)
+
+	for y := 0; y < imageHeight; y++ {
+		go func() {
+			for x := 0; x < imageWidth; x++ {
+				pixels <- samplePixel(scene.Pixel{X: x, Y: y})
+			}
+		}()
+	}
 
 	var wg sync.WaitGroup
 	wg.Add(imageWidth * imageHeight)
 
 	go func() {
 		for p := range pixels {
-			canvas.WritePixel(p.x, p.y, p.color)
+			canvas.WritePixel(p)
 			wg.Done()
 		}
 	}()
 
-	for x := 0; x < imageWidth; x++ {
-		go func(x int) {
-			for y := 0; y < imageHeight; y++ {
-				pixels <- samplePixel(x, y)
-			}
-		}(x)
-	}
-
 	wg.Wait()
-	close(pixels)
 
+	close(pixels)
 	canvas.Run()
 }
