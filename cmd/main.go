@@ -70,6 +70,7 @@ func randomScene() hittable.HitList {
 			}
 		}
 	}
+
 	hl = append(hl, shapes.NewSphere(0, 1, 0, 1, dielectric))
 	hl = append(hl, shapes.NewSphere(-4, 1, 0, 1, lambertian))
 	hl = append(hl, shapes.NewSphere(4, 1, 0, 1, metal))
@@ -99,6 +100,7 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
+	world = randomScene()
 	aspectRatio := math.Real(aspectRatio)
 	imageHeight = int(math.Real(imageWidth) / aspectRatio)
 	lookFrom := geometry.Vec3{X: 13, Y: 2, Z: 3}
@@ -117,8 +119,6 @@ func main() {
 		focusDistance,
 	)
 
-	world = randomScene()
-
 	canvasOpts := scene.CanvasOpts{
 		Width:           imageWidth,
 		Height:          imageHeight,
@@ -129,26 +129,27 @@ func main() {
 	canvas = scene.NewCanvas(canvasOpts)
 	pixels := make(chan scene.Pixel, imageWidth*imageHeight)
 
-	for y := 0; y < imageHeight; y++ {
-		go func() {
-			for x := 0; x < imageWidth; x++ {
-				pixels <- samplePixel(scene.Pixel{X: x, Y: y})
-			}
-		}()
-	}
-
 	var wg sync.WaitGroup
 	wg.Add(imageWidth * imageHeight)
 
 	go func() {
+		for y := 0; y < imageHeight; y++ {
+			for x := 0; x < imageWidth; x++ {
+				pixels <- scene.Pixel{X: x, Y: y}
+			}
+		}
+	}()
+
+	go func() {
 		for p := range pixels {
-			canvas.WritePixel(p)
-			wg.Done()
+			go func(p scene.Pixel) {
+				canvas.WritePixel(samplePixel(p))
+				wg.Done()
+			}(p)
 		}
 	}()
 
 	wg.Wait()
-
 	close(pixels)
 	canvas.Run()
 }
